@@ -18,23 +18,32 @@ Root cleanup has been completed:
 - A root `.gitignore` has been added.
 - Proposal files have been moved into `docs/proposal/`.
 - `README.md` remains at the project root as the main orientation file.
+- A Next.js application has been created in `web/`.
+- The initial Next.js app passes `npm run lint`.
+- The initial Next.js app passes `npm run build`.
 
-This is still not yet an application codebase. There is no Next.js app, package
-manifest, Supabase migration folder, or deployment configuration yet.
+This is now an application codebase foundation, but not yet the ELLI blogging
+MVP. There is no Supabase project configuration, database migration folder,
+authentication flow, student dashboard, admin workflow, or deployment
+configuration yet.
 
-The next development step is to create the actual application workspace in
-`web/`, then implement the MVP workflow described in
-`docs/proposal/Proposal.docx`.
+The next development step is to start the local Next.js development server,
+commit the generated `web/` app, then create the Supabase foundation described
+in `docs/proposal/Proposal.docx`.
 
 ## Current Root Layout
 
 | File | Type | Purpose | Notes |
 | --- | --- | --- | --- |
 | `README.md` | Markdown | Project orientation and start guide | Main project overview and development plan. |
+| `.node-version` | Node version marker | Records the Node version used for the initial app setup | `v24.16.0`. |
 | `.gitignore` | Git ignore rules | Prevents local/generated files from being committed | Includes `.DS_Store`, `node_modules/`, `.next/`, `.env.local`, logs, and build output. |
 | `docs/proposal/Proposal.docx` | Word document | Master proposal and technical development plan | Most detailed source. Word metadata reports 49 pages and 8,412 words. |
 | `docs/proposal/ELLI Blogging Platform Proposal.pdf` | PDF | Proposal/export copy | 8-page PDF export. Likely intended for sharing or submission. |
 | `docs/proposal/Proposal & Project Design.pdf` | PDF | Proposal/project design export | 8-page PDF export. Likely another shareable version. |
+| `web/package.json` | npm package manifest | Next.js app dependency and script definition | Created with `create-next-app@16.2.9`. |
+| `web/src/app/` | Next.js App Router source | Initial route, layout, global styles, and favicon | Default starter app; not yet customized for ELLI. |
+| `web/package-lock.json` | npm lockfile | Reproducible dependency install record | Should be committed. |
 | `.DS_Store` | macOS metadata | Finder-generated file | Not part of the project. Should usually be ignored by Git. |
 
 Important file checks from the local folder:
@@ -45,8 +54,10 @@ Important file checks from the local folder:
   2026-06-08.
 - `docs/proposal/Proposal.docx` contains no tracked insertions, tracked
   deletions, or Word comments.
-- The folder is now a Git repository, but the first project commit has not been
-  made yet.
+- The initial planning workspace commit has been made.
+- The Next.js app has been generated but has not yet been committed.
+- Node.js was not available on the original PATH, so Node `v24.16.0` was
+  downloaded locally for setup and recorded in `.node-version`.
 
 ## Project Summary
 
@@ -127,6 +138,7 @@ Target structure:
 ELLI Blogging Platform/
   README.md
   .gitignore
+  .node-version
   docs/
     proposal/
       Proposal.docx
@@ -143,6 +155,7 @@ ELLI Blogging Platform/
       accessibility-checklist.md
   web/
     package.json
+    package-lock.json
     next.config.ts
     src/
       app/
@@ -164,18 +177,17 @@ files. The `web/` subfolder approach is safer.
 
 ## Where To Start
 
-The project foundation has now been started. Git, `.gitignore`, and
-`docs/proposal/` are done.
+The project foundation has now been started. Git, `.gitignore`,
+`.node-version`, `docs/proposal/`, and the initial `web/` Next.js app are done.
 
 The immediate next starting point is:
 
-1. Review the root cleanup with `git status`.
-2. Stage and commit the planning baseline.
-3. Create the Next.js app in `web/`.
-4. Confirm the app starts locally with `npm run dev`.
-5. Create a Supabase project.
-6. Define the first database migration.
-7. Implement authentication and profiles before blog features.
+1. Start the local Next.js dev server from `web/`.
+2. Confirm the starter page opens at `http://localhost:3000`.
+3. Commit the generated Next.js app.
+4. Create a Supabase project.
+5. Define the first database migration.
+6. Implement authentication and profiles before blog features.
 
 This order matters because every later feature depends on user identity,
 authorization, and database access rules.
@@ -204,22 +216,21 @@ coverage/
 *.log
 ```
 
-Next, make the first commit when ready:
+First commit completed:
 
-```bash
-git add README.md .gitignore docs/proposal
-git commit -m "Initialize ELLI Blogging Platform planning workspace"
+```text
+bdb9743 Initialize ELLI Blogging Platform planning workspace
 ```
 
 ### Step 2: Create The Web App
 
-Create the app in a `web/` subfolder:
+Completed. The app was created in a `web/` subfolder with:
 
 ```bash
-npx create-next-app@latest web --typescript --tailwind --eslint --app --src-dir --import-alias "@/*"
+npx create-next-app@latest web --typescript --tailwind --eslint --app --src-dir --import-alias "@/*" --use-npm --disable-git --yes
 ```
 
-Recommended initial choices:
+Selected initial choices:
 
 - Use TypeScript.
 - Use the App Router.
@@ -227,15 +238,45 @@ Recommended initial choices:
 - Use ESLint.
 - Use a `src/` directory.
 - Use `@/*` as the import alias.
+- Use npm.
+- Skip nested Git initialization because the project root is already a Git
+  repository.
 
-Then run:
+Created app baseline:
+
+- Next.js `16.2.9`
+- React `19.2.4`
+- Tailwind CSS `4`
+- TypeScript `5`
+- ESLint `9`
+- npm lockfile at `web/package-lock.json`
+
+Verification completed:
 
 ```bash
 cd web
+npm run lint
+npm run build
 npm run dev
 ```
 
-At this point, the only goal is to prove the app starts locally.
+Lint and production build both pass. The local development server starts at
+`http://localhost:3000`, and `curl -I http://localhost:3000` returns `200 OK`.
+
+Note: setup used Node.js `v24.16.0`. If `node` and `npm` are not available on
+the shell PATH, use the local runtime path that was downloaded during setup:
+
+```bash
+PATH=/Users/bko/.local/node/node-v24.16.0-darwin-arm64/bin:$PATH npm run dev
+```
+
+Current npm audit note:
+
+- `npm audit` reports 2 moderate findings through Next.js' internal PostCSS
+  dependency.
+- `npm audit fix --force` is not recommended here because npm proposes a
+  breaking downgrade to an old Next.js version.
+- Recheck this after the next stable Next.js patch release.
 
 ### Step 3: Create Supabase Project And Environment Files
 
@@ -741,9 +782,13 @@ Current progress:
 - Done: Git initialized.
 - Done: `.gitignore` added.
 - Done: Proposal files moved into `docs/proposal/`.
-- Pending: Next.js app created in `web/`.
-- Pending: Local dev server runs.
-- Pending: First commit exists.
+- Done: First planning workspace commit exists.
+- Done: Next.js app created in `web/`.
+- Done: `npm run lint` passes.
+- Done: `npm run build` passes.
+- Done: Local dev server starts at `http://localhost:3000`.
+- Done: `curl -I http://localhost:3000` returns `200 OK`.
+- Done: Next.js app creation has been committed.
 
 ### Milestone 1: Supabase Foundation
 
@@ -900,11 +945,10 @@ Planned phases:
 | Phase 5 | June 28 - July 3 | Final polish, report, demo, submission. |
 
 As of June 12, 2026, the project should ideally be in Phase 2. The project root
-has now been initialized and the proposal files have been organized, but this
-folder does not yet contain app code. The practical next step is to finish the
-remaining pieces of Milestone 0 by creating the `web/` app, confirming the local
-dev server runs, and making the first baseline commit. After that, move directly
-to Milestone 1 and the student submission workflow.
+has now been initialized, proposal files have been organized, and the initial
+Next.js app has been generated in `web/`. The practical next step is to run the
+local dev server, verify the starter page in the browser, commit the generated
+app, and then move directly to Milestone 1 and the student submission workflow.
 
 ## Recommended Immediate Task List
 
@@ -913,23 +957,26 @@ Start here:
 1. [x] Create `.gitignore`.
 2. [x] Initialize Git.
 3. [x] Move proposal files into `docs/proposal/`.
-4. [ ] Commit the planning baseline.
-5. [ ] Create `web/` with Next.js, TypeScript, Tailwind, and App Router.
-6. [ ] Confirm `npm run dev` works.
-7. [ ] Create Supabase project.
-8. [ ] Add `.env.example`.
-9. [ ] Create `profiles` and `posts` migrations.
-10. [ ] Enable RLS.
-11. [ ] Implement signup/login/logout.
-12. [ ] Implement role loading.
-13. [ ] Implement student dashboard.
-14. [ ] Implement create/edit post form.
-15. [ ] Implement submit for review.
-16. [ ] Implement admin dashboard.
-17. [ ] Implement approve/publish flow.
-18. [ ] Implement public blog pages.
-19. [ ] Write setup and handoff docs.
-20. [ ] Prepare final demo.
+4. [x] Commit the planning baseline.
+5. [x] Create `web/` with Next.js, TypeScript, Tailwind, and App Router.
+6. [x] Confirm `npm run dev` works.
+7. [x] Confirm `npm run lint` works.
+8. [x] Confirm `npm run build` works.
+9. [x] Commit the generated Next.js app.
+10. [ ] Create Supabase project.
+11. [ ] Add `.env.example`.
+12. [ ] Create `profiles` and `posts` migrations.
+13. [ ] Enable RLS.
+14. [ ] Implement signup/login/logout.
+15. [ ] Implement role loading.
+16. [ ] Implement student dashboard.
+17. [ ] Implement create/edit post form.
+18. [ ] Implement submit for review.
+19. [ ] Implement admin dashboard.
+20. [ ] Implement approve/publish flow.
+21. [ ] Implement public blog pages.
+22. [ ] Write setup and handoff docs.
+23. [ ] Prepare final demo.
 
 The most important first coding milestone is not the homepage. It is:
 
