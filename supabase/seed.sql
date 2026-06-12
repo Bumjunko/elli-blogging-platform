@@ -1,0 +1,2 @@
+-- Seed data will be added after the authentication and role workflow exists.
+-- Keep this file committed so local `supabase db reset` has a stable seed path.

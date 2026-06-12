@@ -8,6 +8,34 @@ Platform.
 - Supabase project URL is configured locally in `web/.env.local`.
 - The publishable key is configured locally in `web/.env.local`.
 - The service role key is intentionally not stored in this repository.
+- Supabase CLI has been initialized with `supabase/config.toml`.
+- The initial migration has been applied to the remote Supabase database.
+- Direct IPv6 database access was not available from this machine, so the
+  migration was applied through the session pooler host for this project.
+
+## CLI Status
+
+The CLI is currently run through:
+
+```bash
+npx supabase@latest
+```
+
+The local CLI project has been initialized:
+
+```bash
+npx supabase@latest init
+```
+
+Remote linking is not complete yet because `supabase link` requires a Supabase
+Personal Access Token. To complete the link later:
+
+```bash
+npx supabase@latest login --token <personal-access-token>
+npx supabase@latest link --project-ref nohzklegahxyakthvosg
+```
+
+Use the database password only when the CLI prompts for it. Do not commit it.
 
 ## Apply The Initial Schema
 
@@ -17,7 +45,22 @@ The first migration is:
 supabase/migrations/20260612143000_initial_schema.sql
 ```
 
-Apply it in the Supabase Dashboard:
+Status: applied to the remote database on June 12, 2026.
+
+Verification completed:
+
+- `supabase db push --dry-run` reports that the remote database is up to date.
+- The public Data API returns `200 OK` for `/rest/v1/posts?select=id&limit=1`.
+- These public tables exist with RLS enabled:
+  - `profiles`
+  - `posts`
+  - `post_status_history`
+  - `deletion_requests`
+- The `post-images` storage bucket exists, is private, and has a 5 MB file size
+  limit.
+
+If the migration needs to be applied manually in a fresh project, use the
+Supabase Dashboard:
 
 1. Open the Supabase project.
 2. Go to SQL Editor.
@@ -31,8 +74,9 @@ Apply it in the Supabase Dashboard:
    - `deletion_requests`
 7. Confirm the `post-images` storage bucket exists.
 
-Later, when the Supabase CLI is configured with an access token and database
-password, this same folder can be used as the migration source.
+After `supabase link` is completed with a Personal Access Token, this same
+folder can be used as the migration source for normal linked-project CLI
+commands.
 
 ## Security Notes
 

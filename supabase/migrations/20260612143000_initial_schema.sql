@@ -99,6 +99,16 @@ create index if not exists deletion_requests_post_id_idx
 create index if not exists deletion_requests_status_idx
   on public.deletion_requests(status);
 
+grant usage on schema public to anon, authenticated;
+grant usage on type public.post_review_status to anon, authenticated;
+
+grant select on public.posts to anon;
+grant select on public.profiles to authenticated;
+grant insert, update on public.profiles to authenticated;
+grant select, insert, update on public.posts to authenticated;
+grant select, insert on public.post_status_history to authenticated;
+grant select, insert, update on public.deletion_requests to authenticated;
+
 create or replace function public.set_updated_at()
 returns trigger
 language plpgsql

@@ -33,15 +33,19 @@ Root cleanup has been completed:
   `web/src/lib/supabase/`.
 - The first Supabase migration has been drafted under `supabase/migrations/`.
 - Supabase setup notes have been added under `supabase/README.md`.
+- Supabase CLI has been initialized under `supabase/config.toml`.
+- The initial Supabase migration has been applied to the remote Supabase
+  database.
+- Remote verification confirms the four application tables have RLS enabled and
+  the `post-images` bucket exists as a private 5 MB bucket.
 
 This is now an application codebase foundation, but not yet the ELLI blogging
-MVP. The local Supabase setup files exist, but the SQL migration still needs to
-be applied inside the Supabase project. Authentication screens, student
-dashboard, admin workflow, public blog pages, and deployment configuration are
-not implemented yet.
+MVP. The Supabase database foundation now exists, but authentication screens,
+student dashboard, admin workflow, public blog pages, and deployment
+configuration are not implemented yet.
 
-The next development step is to apply the initial Supabase migration, configure
-Auth, and then build signup/login/profile wiring before creating blog features.
+The next development step is to configure Supabase Auth settings and then build
+signup/login/profile wiring before creating blog features.
 
 ## Current Root Layout
 
@@ -59,8 +63,11 @@ Auth, and then build signup/login/profile wiring before creating blog features.
 | `web/src/lib/supabase/` | Supabase client helpers | Browser and server client factories | Uses publishable key and cookie-aware SSR client setup. |
 | `web/.env.example` | Web environment template | Documents variables needed by the Next.js app | Safe to commit; real local values stay in ignored `web/.env.local`. |
 | `web/package-lock.json` | npm lockfile | Reproducible dependency install record | Should be committed. |
-| `supabase/README.md` | Supabase setup guide | Explains how to apply the migration and handle secrets | Includes security reminders. |
-| `supabase/migrations/20260612143000_initial_schema.sql` | SQL migration | Creates initial tables, RLS policies, auth trigger, and storage bucket | Must still be run in Supabase SQL Editor or through Supabase CLI. |
+| `supabase/.gitignore` | Supabase local ignore rules | Prevents local Supabase temp files and env files from being committed | Created by `supabase init`. |
+| `supabase/config.toml` | Supabase CLI config | Local Supabase CLI configuration | Created by `supabase init`; configured for local Next.js on port 3000. |
+| `supabase/README.md` | Supabase setup guide | Explains CLI status, migration verification, and secret handling | Includes security reminders. |
+| `supabase/migrations/20260612143000_initial_schema.sql` | SQL migration | Creates initial tables, RLS policies, auth trigger, and storage bucket | Applied to the remote Supabase database on June 12, 2026. |
+| `supabase/seed.sql` | Supabase seed file | Placeholder for future demo seed data | Keeps local `supabase db reset` seed path stable. |
 | `.DS_Store` | macOS metadata | Finder-generated file | Not part of the project. Should usually be ignored by Git. |
 
 Important file checks from the local folder:
@@ -228,6 +235,8 @@ ELLI Blogging Platform/
         supabase/
       types/
   supabase/
+    .gitignore
+    config.toml
     README.md
     migrations/
       20260612143000_initial_schema.sql
@@ -246,23 +255,21 @@ files. The `web/` subfolder approach is safer.
 
 The project foundation has now been started. Git, `.gitignore`,
 `.node-version`, `docs/proposal/`, the initial `web/` Next.js app, Supabase
-environment templates, Supabase client helpers, and the first local migration
-draft are done.
+environment templates, Supabase client helpers, Supabase CLI initialization,
+and the first remote database migration are done.
 
 The immediate next starting point is:
 
-1. Apply `supabase/migrations/20260612143000_initial_schema.sql` in the
-   Supabase SQL Editor.
-2. Confirm the `profiles`, `posts`, `post_status_history`, and
-   `deletion_requests` tables were created.
-3. Confirm the `post-images` storage bucket was created.
-4. In Supabase Auth, review email confirmation and redirect URL settings.
-5. Create the signup/login/logout pages in Next.js.
-6. Connect signup to Supabase Auth and pass profile consent metadata.
-7. Test that only `@angelo.edu` addresses can register.
-8. Manually assign the first admin role in the `profiles` table.
-9. Implement protected student/admin route checks.
-10. Build the student dashboard and post creation flow.
+1. In Supabase Auth, review email confirmation and redirect URL settings.
+2. Create the signup/login/logout pages in Next.js.
+3. Connect signup to Supabase Auth and pass profile consent metadata.
+4. Test that only `@angelo.edu` addresses can register.
+5. Manually assign the first admin role in the `profiles` table.
+6. Implement protected student/admin route checks.
+7. Build the student dashboard and post creation flow.
+8. Build the admin review workflow.
+9. Build the public blog pages.
+10. Prepare deployment and handoff documentation.
 
 This order matters because every later feature depends on user identity,
 authorization, and database access rules.
@@ -395,7 +402,7 @@ Added app helpers:
 
 ### Step 4: Implement The Database Before The UI Gets Large
 
-Started locally. The first SQL migration is:
+Completed for the first backend foundation. The first SQL migration is:
 
 ```text
 supabase/migrations/20260612143000_initial_schema.sql
@@ -422,9 +429,22 @@ The migration also adds:
 - Storage policies for student-owned uploads, admin access, and public reads of
   approved/published post images.
 
-This migration has been written to the repository, but it has not yet been
-applied to the remote Supabase database from this machine. Apply it through
-Supabase SQL Editor using the instructions in `supabase/README.md`.
+This migration has been written to the repository and applied to the remote
+Supabase database through the Supabase CLI using the session pooler. Direct IPv6
+database access was not available from this machine, so the pooler connection
+was used.
+
+Remote verification completed:
+
+- `supabase db push --dry-run` reports that the remote database is up to date.
+- The public Data API returns `200 OK` for `/rest/v1/posts?select=id&limit=1`.
+- `profiles`, `posts`, `post_status_history`, and `deletion_requests` exist
+  with RLS enabled.
+- The `post-images` bucket exists, is private, and has a 5 MB file size limit.
+
+CLI note: `supabase init` is complete. `supabase link` still requires a
+Supabase Personal Access Token, so linked-project CLI commands are not fully
+enabled yet.
 
 ### Step 5: Implement Authentication And Profiles
 
@@ -912,10 +932,14 @@ Current progress:
 - Done locally: root and web `.env.example` files exist.
 - Done locally: `@supabase/supabase-js` and `@supabase/ssr` are installed.
 - Done locally: browser/server Supabase client helpers exist.
-- Done locally: initial SQL migration has been drafted.
-- Pending remote action: run the SQL migration in Supabase SQL Editor.
-- Pending verification: confirm remote tables, RLS policies, auth trigger, and
-  `post-images` bucket exist in Supabase.
+- Done locally: Supabase CLI has been initialized with `supabase/config.toml`.
+- Done locally: initial SQL migration has been drafted and committed.
+- Done remotely: initial SQL migration has been applied to Supabase.
+- Done remotely: remote database is up to date according to `supabase db push
+  --dry-run`.
+- Done remotely: the four application tables have RLS enabled.
+- Done remotely: the `post-images` bucket exists as a private 5 MB bucket.
+- Pending CLI auth: `supabase link` requires a Supabase Personal Access Token.
 
 ### Milestone 2: Authentication
 
@@ -1062,8 +1086,8 @@ Planned phases:
 As of June 12, 2026, the project should ideally be in Phase 2. The project root
 has now been initialized, proposal files have been organized, the initial
 Next.js app has been generated and committed in `web/`, and the local Supabase
-foundation has been prepared. The practical next step is to apply the Supabase
-migration, verify the database policies, and then move directly into
+foundation has been prepared and applied to the remote database. The practical
+next step is to configure Supabase Auth settings and move directly into
 authentication/profile wiring.
 
 ## Recommended Immediate Task List
@@ -1086,8 +1110,8 @@ Start here:
 14. [x] Add Supabase browser/server client helpers.
 15. [x] Create initial `profiles`, `posts`, status history, and deletion request migration.
 16. [x] Draft RLS and storage policies in the migration.
-17. [ ] Apply the migration in Supabase SQL Editor.
-18. [ ] Confirm remote tables, RLS policies, auth trigger, and storage bucket.
+17. [x] Apply the migration to the remote Supabase database.
+18. [x] Confirm remote tables, RLS policies, Data API access, and storage bucket.
 19. [ ] Configure Supabase Auth redirect URLs.
 20. [ ] Implement signup/login/logout.
 21. [ ] Implement role loading.
