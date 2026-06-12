@@ -46,13 +46,14 @@ Root cleanup has been completed:
 - `/dashboard` is now protected and redirects signed-out visitors to `/login`.
 
 This is now an application codebase foundation, but not yet the ELLI blogging
-MVP. The Supabase database foundation and first authentication slice now exist,
-but post creation, admin review, public blog pages, and deployment
-configuration are not implemented yet.
+MVP. The Supabase database foundation, first authentication slice, dashboard
+shell, and new-post draft/submission flow now exist. Image upload, post editing,
+admin review, public blog pages, and deployment configuration are not
+implemented yet.
 
-The next development step is to confirm Supabase Auth redirect/email settings
-in the Dashboard, test signup with a real `@angelo.edu` email, and then build
-the student post creation workflow.
+The next development step is to test signup/login with a real `@angelo.edu`
+email, create a draft from `/dashboard/posts/new`, submit it for review, and
+then add the image upload workflow.
 
 ## Current Root Layout
 
@@ -66,7 +67,7 @@ the student post creation workflow.
 | `docs/proposal/ELLI Blogging Platform Proposal.pdf` | PDF | Proposal/export copy | 8-page PDF export. Likely intended for sharing or submission. |
 | `docs/proposal/Proposal & Project Design.pdf` | PDF | Proposal/project design export | 8-page PDF export. Likely another shareable version. |
 | `web/package.json` | npm package manifest | Next.js app dependency and script definition | Created with `create-next-app@16.2.9`. |
-| `web/src/app/` | Next.js App Router source | Home, signup, login, auth callback, dashboard, layout, global styles, and favicon | First auth slice is implemented; post editor is next. |
+| `web/src/app/` | Next.js App Router source | Home, signup, login, auth callback, dashboard, new post flow, layout, global styles, and favicon | First auth and text-post submission slices are implemented; image upload is next. |
 | `web/src/lib/supabase/` | Supabase client helpers | Browser and server client factories | Uses publishable key and cookie-aware SSR client setup. |
 | `web/.env.example` | Web environment template | Documents variables needed by the Next.js app | Safe to commit; real local values stay in ignored `web/.env.local`. |
 | `web/package-lock.json` | npm lockfile | Reproducible dependency install record | Should be committed. |
@@ -271,12 +272,12 @@ The immediate next starting point is:
 2. Test signup with a real `@angelo.edu` email.
 3. Confirm the email callback lands on `/auth/callback` and then `/dashboard`.
 4. Confirm the `profiles` row is created with role `student`.
-5. Manually assign the first admin role in the `profiles` table.
-6. Build the student post creation flow.
-7. Implement submit-for-review.
-8. Build the admin review workflow.
-9. Build the public blog pages.
-10. Prepare deployment and handoff documentation.
+5. Create a draft from `/dashboard/posts/new`.
+6. Submit the draft for review and confirm it appears as `submitted`.
+7. Add image upload to the post workflow.
+8. Manually assign the first admin role in the `profiles` table.
+9. Build the admin review workflow.
+10. Build the public blog pages.
 
 This order matters because every later feature depends on user identity,
 authorization, and database access rules.
@@ -988,6 +989,18 @@ Definition of done:
 - Student can submit for review.
 - Student can see status.
 
+Current progress:
+
+- Done in code: dashboard has an active `New post` link.
+- Done in code: `/dashboard/posts/new` page exists and is protected.
+- Done in code: students can save a text draft.
+- Done in code: students can submit a text post for review.
+- Done in code: submit-for-review requires photo and public-posting consent
+  checkboxes.
+- Done in code: dashboard lists the signed-in student's posts and statuses.
+- Pending: edit existing draft page.
+- Pending: image upload and image alt text workflow.
+
 ### Milestone 4: Admin Review Workflow
 
 Definition of done:
@@ -1138,8 +1151,8 @@ Start here:
 20. [x] Implement signup/login/logout.
 21. [x] Implement role loading.
 22. [x] Implement student dashboard shell.
-23. [ ] Implement create/edit post form.
-24. [ ] Implement submit for review.
+23. [x] Implement create post form.
+24. [x] Implement submit for review.
 25. [ ] Implement admin dashboard.
 26. [ ] Implement approve/publish flow.
 27. [ ] Implement public blog pages.
@@ -1152,7 +1165,9 @@ The most important first coding milestone is not the homepage. It is:
 A student can sign up, log in, create a draft, and submit it for review.
 ```
 
-Once that works, the admin and public workflows have real data to operate on.
+This is now implemented in code for text-only posts. It still needs manual
+end-to-end testing with a real confirmed `@angelo.edu` account, and image upload
+is still the next feature step.
 
 ## Production Readiness Notes
 

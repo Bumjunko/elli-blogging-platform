@@ -32,7 +32,16 @@ const statusLabels: Record<PostSummary["review_status"], string> = {
   archived: "Archived",
 };
 
-export default async function DashboardPage() {
+type DashboardPageProps = {
+  searchParams?: Promise<{
+    message?: string;
+  }>;
+};
+
+export default async function DashboardPage({
+  searchParams,
+}: DashboardPageProps) {
+  const resolvedSearchParams = await searchParams;
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
@@ -107,18 +116,23 @@ export default async function DashboardPage() {
                   My blog submissions
                 </h2>
                 <p className="mt-1 text-sm leading-6 text-slate-600">
-                  Draft creation is the next workflow to implement.
+                  Create drafts, submit posts for review, and track status.
                 </p>
               </div>
-              <button
-                type="button"
-                disabled
-                className="h-10 rounded-md bg-slate-200 px-4 text-sm font-semibold text-slate-500"
+              <Link
+                href="/dashboard/posts/new"
+                className="flex h-10 items-center justify-center rounded-md bg-[#174a7c] px-4 text-sm font-semibold text-white transition hover:bg-[#10385f]"
               >
                 New post
-              </button>
+              </Link>
             </div>
           </div>
+
+          {resolvedSearchParams?.message ? (
+            <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
+              {resolvedSearchParams.message}
+            </div>
+          ) : null}
 
           {postsError ? (
             <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">
