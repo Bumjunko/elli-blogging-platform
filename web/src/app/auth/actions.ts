@@ -114,9 +114,14 @@ export async function signInAction(
   });
 
   if (error) {
+    const message =
+      error.message === "Invalid login credentials"
+        ? "The email or password you entered is incorrect."
+        : error.message;
+
     return {
       status: "error",
-      message: error.message,
+      message,
     };
   }
 
