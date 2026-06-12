@@ -10,7 +10,7 @@ Last reviewed: June 12, 2026
 ## Current Status
 
 This folder is now initialized as the project root for the ELLI Student Blogging
-Platform.
+Platform, and the initial Next.js web application has been created.
 
 Root cleanup has been completed:
 
@@ -21,15 +21,18 @@ Root cleanup has been completed:
 - A Next.js application has been created in `web/`.
 - The initial Next.js app passes `npm run lint`.
 - The initial Next.js app passes `npm run build`.
+- The initial Next.js app starts locally with `npm run dev`.
+- `http://localhost:3000` returns `200 OK` while the dev server is running.
+- The generated Next.js app has been committed.
 
 This is now an application codebase foundation, but not yet the ELLI blogging
 MVP. There is no Supabase project configuration, database migration folder,
 authentication flow, student dashboard, admin workflow, or deployment
 configuration yet.
 
-The next development step is to start the local Next.js development server,
-commit the generated `web/` app, then create the Supabase foundation described
-in `docs/proposal/Proposal.docx`.
+The next development step is to create the Supabase foundation described in
+`docs/proposal/Proposal.docx`: environment placeholders, database schema,
+Row Level Security policies, and authentication/profile wiring.
 
 ## Current Root Layout
 
@@ -55,7 +58,8 @@ Important file checks from the local folder:
 - `docs/proposal/Proposal.docx` contains no tracked insertions, tracked
   deletions, or Word comments.
 - The initial planning workspace commit has been made.
-- The Next.js app has been generated but has not yet been committed.
+- The Next.js app has been generated and committed in
+  `705ec87 Create Next.js web app`.
 - Node.js was not available on the original PATH, so Node `v24.16.0` was
   downloaded locally for setup and recorded in `.node-version`.
 
@@ -125,6 +129,49 @@ Before production use, current pricing, ASU hosting options, ASU domain rules,
 SSO feasibility, accessibility requirements, and institutional privacy review
 should be verified with the relevant ASU/CIS stakeholders.
 
+## What Next.js Does In This Project
+
+Next.js is the main web application framework for this project. React is the UI
+library used to build components, while Next.js provides the application
+structure needed to turn those components into a real deployable web app.
+
+In this project, Next.js is responsible for:
+
+- Page routing: mapping files under `web/src/app/` to URLs such as `/`,
+  `/login`, `/dashboard`, `/admin`, and `/blog/[slug]`.
+- Layout structure: defining shared page shells through `layout.tsx`.
+- Public pages: rendering the public home page, blog list, and blog detail
+  pages.
+- Student pages: rendering signup, login, dashboard, create/edit post, and
+  submission-status pages.
+- Admin pages: rendering staff-only review dashboards and post review pages.
+- Server-side logic: safely running code that should not live only in the
+  browser, such as role checks, protected data reads, and future Supabase server
+  operations.
+- Client-side interactivity: supporting forms, image previews, checkbox state,
+  filters, confirmation prompts, and other browser interactions.
+- Build output: producing optimized production assets with `npm run build`.
+- Deployment readiness: preparing the app for Vercel or another Next.js-capable
+  hosting platform.
+
+Next.js does not replace Supabase. The planned division of responsibility is:
+
+| Area | Responsible Tool |
+| --- | --- |
+| Page routing and UI | Next.js |
+| React components | React inside Next.js |
+| Styling | Tailwind CSS |
+| Authentication | Supabase Auth |
+| Database | Supabase PostgreSQL |
+| File storage | Supabase Storage |
+| Row-level data protection | Supabase RLS |
+| Hosting prototype | Vercel plus Supabase |
+
+For the ELLI Blogging Platform, this means Next.js is the visible application
+layer and Supabase is the backend data/auth/storage layer. Both are needed:
+Next.js can hide or redirect pages based on role, but Supabase RLS must still
+enforce the final data-access rules.
+
 ## Recommended Repository Structure
 
 This folder is now the project root. The proposal documents are already stored
@@ -182,11 +229,11 @@ The project foundation has now been started. Git, `.gitignore`,
 
 The immediate next starting point is:
 
-1. Start the local Next.js dev server from `web/`.
-2. Confirm the starter page opens at `http://localhost:3000`.
-3. Commit the generated Next.js app.
-4. Create a Supabase project.
-5. Define the first database migration.
+1. Create a Supabase project for the prototype.
+2. Add `.env.example` at the project root.
+3. Add local environment values in `web/.env.local`.
+4. Create the first `profiles` and `posts` schema draft.
+5. Enable Row Level Security early.
 6. Implement authentication and profiles before blog features.
 
 This order matters because every later feature depends on user identity,
@@ -946,9 +993,9 @@ Planned phases:
 
 As of June 12, 2026, the project should ideally be in Phase 2. The project root
 has now been initialized, proposal files have been organized, and the initial
-Next.js app has been generated in `web/`. The practical next step is to run the
-local dev server, verify the starter page in the browser, commit the generated
-app, and then move directly to Milestone 1 and the student submission workflow.
+Next.js app has been generated and committed in `web/`. The practical next step
+is to move directly to Milestone 1: Supabase foundation, environment setup,
+database schema, RLS, and authentication/profile wiring.
 
 ## Recommended Immediate Task List
 
