@@ -1,0 +1,174 @@
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { signOutAction } from "@/app/auth/actions";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+
+type Profile = {
+  email: string;
+  full_name: string;
+  role: "student" | "admin";
+};
+
+type PostSummary = {
+  id: string;
+  title: string;
+  review_status:
+    | "draft"
+    | "submitted"
+    | "revision_requested"
+    | "approved"
+    | "rejected"
+    | "archived";
+  is_published: boolean;
+  updated_at: string;
+};
+
+const statusLabels: Record<PostSummary["review_status"], string> = {
+  draft: "Draft",
+  submitted: "Submitted",
+  revision_requested: "Revision requested",
+  approved: "Approved",
+  rejected: "Rejected",
+  archived: "Archived",
+};
+
+export default async function DashboardPage() {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login?next=/dashboard");
+  }
+
+  const [{ data: profile }, { data: posts, error: postsError }] =
+    await Promise.all([
+      supabase
+        .from("profiles")
+        .select("email, full_name, role")
+        .eq("id", user.id)
+        .maybeSingle<Profile>(),
+      supabase
+        .from("posts")
+        .select("id, title, review_status, is_published, updated_at")
+        .order("updated_at", { ascending: false })
+        .returns<PostSummary[]>(),
+    ]);
+
+  return (
+    <main className="min-h-screen bg-[#f5f7fa] text-slate-950">
+      <header className="border-b border-slate-200 bg-white">
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <Link href="/" className="text-sm font-semibold text-[#174a7c]">
+              ELLI Blogging Platform
+            </Link>
+            <h1 className="mt-2 text-2xl font-semibold tracking-normal">
+              Student Dashboard
+            </h1>
+          </div>
+          <form action={signOutAction}>
+            <button
+              type="submit"
+              className="h-10 rounded-md border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-100"
+            >
+              Sign out
+            </button>
+          </form>
+        </div>
+      </header>
+
+      <div className="mx-auto grid w-full max-w-6xl gap-6 px-6 py-8 lg:grid-cols-[280px_1fr]">
+        <aside className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+          <p className="text-sm font-semibold text-slate-500">Signed in as</p>
+          <h2 className="mt-2 text-lg font-semibold text-slate-950">
+            {profile?.full_name || user.email}
+          </h2>
+          <p className="mt-1 break-words text-sm text-slate-600">
+            {profile?.email || user.email}
+          </p>
+          <div className="mt-4 inline-flex rounded-md bg-[#e8f1f9] px-3 py-1 text-sm font-semibold capitalize text-[#174a7c]">
+            {profile?.role ?? "student"}
+          </div>
+
+          {!profile ? (
+            <p className="mt-5 rounded-md bg-amber-50 px-3 py-2 text-sm leading-6 text-amber-900">
+              Your auth account exists, but the profile row was not found.
+            </p>
+          ) : null}
+        </aside>
+
+        <section className="space-y-6">
+          <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="text-xl font-semibold text-slate-950">
+                  My blog submissions
+                </h2>
+                <p className="mt-1 text-sm leading-6 text-slate-600">
+                  Draft creation is the next workflow to implement.
+                </p>
+              </div>
+              <button
+                type="button"
+                disabled
+                className="h-10 rounded-md bg-slate-200 px-4 text-sm font-semibold text-slate-500"
+              >
+                New post
+              </button>
+            </div>
+          </div>
+
+          {postsError ? (
+            <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+              {postsError.message}
+            </div>
+          ) : null}
+
+          {posts && posts.length > 0 ? (
+            <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+              <ul className="divide-y divide-slate-200">
+                {posts.map((post) => (
+                  <li
+                    key={post.id}
+                    className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between"
+                  >
+                    <div>
+                      <h3 className="font-semibold text-slate-950">
+                        {post.title}
+                      </h3>
+                      <p className="mt-1 text-sm text-slate-600">
+                        Updated {new Date(post.updated_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <span className="rounded-md bg-slate-100 px-3 py-1 text-sm font-medium text-slate-700">
+                        {statusLabels[post.review_status]}
+                      </span>
+                      {post.is_published ? (
+                        <span className="rounded-md bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-800">
+                          Published
+                        </span>
+                      ) : null}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <div className="rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center">
+              <h3 className="text-lg font-semibold text-slate-950">
+                No submissions yet
+              </h3>
+              <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-600">
+                After the post editor is built, student drafts and submitted
+                posts will appear here.
+              </p>
+            </div>
+          )}
+        </section>
+      </div>
+    </main>
+  );
+}

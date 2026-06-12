@@ -40,14 +40,19 @@ Root cleanup has been completed:
   database.
 - Remote verification confirms the four application tables have RLS enabled and
   the `post-images` bucket exists as a private 5 MB bucket.
+- The Next.js home page has been replaced with an ELLI-oriented app entry
+  screen.
+- Supabase Auth signup, login, logout, and callback handling have been added.
+- `/dashboard` is now protected and redirects signed-out visitors to `/login`.
 
 This is now an application codebase foundation, but not yet the ELLI blogging
-MVP. The Supabase database foundation now exists, but authentication screens,
-student dashboard, admin workflow, public blog pages, and deployment
+MVP. The Supabase database foundation and first authentication slice now exist,
+but post creation, admin review, public blog pages, and deployment
 configuration are not implemented yet.
 
-The next development step is to configure Supabase Auth settings and then build
-signup/login/profile wiring before creating blog features.
+The next development step is to confirm Supabase Auth redirect/email settings
+in the Dashboard, test signup with a real `@angelo.edu` email, and then build
+the student post creation workflow.
 
 ## Current Root Layout
 
@@ -61,7 +66,7 @@ signup/login/profile wiring before creating blog features.
 | `docs/proposal/ELLI Blogging Platform Proposal.pdf` | PDF | Proposal/export copy | 8-page PDF export. Likely intended for sharing or submission. |
 | `docs/proposal/Proposal & Project Design.pdf` | PDF | Proposal/project design export | 8-page PDF export. Likely another shareable version. |
 | `web/package.json` | npm package manifest | Next.js app dependency and script definition | Created with `create-next-app@16.2.9`. |
-| `web/src/app/` | Next.js App Router source | Initial route, layout, global styles, and favicon | Default starter app; not yet customized for ELLI. |
+| `web/src/app/` | Next.js App Router source | Home, signup, login, auth callback, dashboard, layout, global styles, and favicon | First auth slice is implemented; post editor is next. |
 | `web/src/lib/supabase/` | Supabase client helpers | Browser and server client factories | Uses publishable key and cookie-aware SSR client setup. |
 | `web/.env.example` | Web environment template | Documents variables needed by the Next.js app | Safe to commit; real local values stay in ignored `web/.env.local`. |
 | `web/package-lock.json` | npm lockfile | Reproducible dependency install record | Should be committed. |
@@ -262,13 +267,13 @@ and the first remote database migration are done.
 
 The immediate next starting point is:
 
-1. In Supabase Auth, review email confirmation and redirect URL settings.
-2. Create the signup/login/logout pages in Next.js.
-3. Connect signup to Supabase Auth and pass profile consent metadata.
-4. Test that only `@angelo.edu` addresses can register.
+1. In Supabase Auth, confirm email confirmation and redirect URL settings.
+2. Test signup with a real `@angelo.edu` email.
+3. Confirm the email callback lands on `/auth/callback` and then `/dashboard`.
+4. Confirm the `profiles` row is created with role `student`.
 5. Manually assign the first admin role in the `profiles` table.
-6. Implement protected student/admin route checks.
-7. Build the student dashboard and post creation flow.
+6. Build the student post creation flow.
+7. Implement submit-for-review.
 8. Build the admin review workflow.
 9. Build the public blog pages.
 10. Prepare deployment and handoff documentation.
@@ -955,6 +960,21 @@ Definition of done:
 - Non-`@angelo.edu` emails are blocked.
 - Admin role can be assigned manually.
 
+Current progress:
+
+- Done in code: `/signup` page exists.
+- Done in code: `/login` page exists.
+- Done in code: `/auth/callback` exchanges Supabase email/session codes.
+- Done in code: logout server action exists.
+- Done in code: signup sends full name and privacy consent metadata to
+  Supabase Auth.
+- Done in code: signup validates `@angelo.edu` before calling Supabase.
+- Done in code: `/dashboard` requires a logged-in Supabase session.
+- Done in code: dashboard reads the signed-in user's profile and own posts.
+- Pending manual Supabase Dashboard check: Auth URL and redirect URL settings.
+- Pending manual test: create and confirm a real `@angelo.edu` account.
+- Pending manual setup: assign the first admin role in `profiles`.
+
 ### Milestone 3: Student Submission Workflow
 
 Definition of done:
@@ -1115,9 +1135,9 @@ Start here:
 17. [x] Apply the migration to the remote Supabase database.
 18. [x] Confirm remote tables, RLS policies, Data API access, and storage bucket.
 19. [ ] Configure Supabase Auth redirect URLs.
-20. [ ] Implement signup/login/logout.
-21. [ ] Implement role loading.
-22. [ ] Implement student dashboard.
+20. [x] Implement signup/login/logout.
+21. [x] Implement role loading.
+22. [x] Implement student dashboard shell.
 23. [ ] Implement create/edit post form.
 24. [ ] Implement submit for review.
 25. [ ] Implement admin dashboard.

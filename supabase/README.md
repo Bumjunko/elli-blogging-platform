@@ -80,6 +80,42 @@ Supabase Dashboard:
 Because `supabase link` is complete, this folder can be used as the migration
 source for normal linked-project CLI commands.
 
+## Auth Dashboard Settings
+
+The Next.js app now has these auth routes:
+
+- `/signup`
+- `/login`
+- `/auth/callback`
+- `/dashboard`
+
+Confirm these settings in the Supabase Dashboard:
+
+1. Go to Authentication.
+2. Open URL Configuration.
+3. Set Site URL to:
+
+   ```text
+   http://localhost:3000
+   ```
+
+4. Add these redirect URLs:
+
+   ```text
+   http://localhost:3000/auth/callback
+   http://localhost:3000/dashboard
+   http://localhost:3000/login
+   ```
+
+5. Go to Authentication, then Providers, then Email.
+6. Confirm email/password signups are enabled.
+7. For a realistic MVP test, keep email confirmation enabled and test with a
+   real `@angelo.edu` inbox.
+
+Do not push the entire local `supabase/config.toml` to the hosted project unless
+the remote config changes have been reviewed. The local file includes
+development settings for the local stack.
+
 ## Security Notes
 
 - Keep Row Level Security enabled on all application tables.
