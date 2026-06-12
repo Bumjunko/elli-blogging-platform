@@ -10,7 +10,8 @@ Last reviewed: June 12, 2026
 ## Current Status
 
 This folder is now initialized as the project root for the ELLI Student Blogging
-Platform, and the initial Next.js web application has been created.
+Platform. The initial Next.js web application has been created, and the first
+Supabase foundation files have been added.
 
 Root cleanup has been completed:
 
@@ -24,15 +25,23 @@ Root cleanup has been completed:
 - The initial Next.js app starts locally with `npm run dev`.
 - `http://localhost:3000` returns `200 OK` while the dev server is running.
 - The generated Next.js app has been committed.
+- Supabase packages have been installed in `web/`.
+- Root and web `.env.example` files have been added.
+- `web/.env.local` has been created locally with the Supabase project URL and
+  publishable key only.
+- Supabase browser/server helper clients have been added under
+  `web/src/lib/supabase/`.
+- The first Supabase migration has been drafted under `supabase/migrations/`.
+- Supabase setup notes have been added under `supabase/README.md`.
 
 This is now an application codebase foundation, but not yet the ELLI blogging
-MVP. There is no Supabase project configuration, database migration folder,
-authentication flow, student dashboard, admin workflow, or deployment
-configuration yet.
+MVP. The local Supabase setup files exist, but the SQL migration still needs to
+be applied inside the Supabase project. Authentication screens, student
+dashboard, admin workflow, public blog pages, and deployment configuration are
+not implemented yet.
 
-The next development step is to create the Supabase foundation described in
-`docs/proposal/Proposal.docx`: environment placeholders, database schema,
-Row Level Security policies, and authentication/profile wiring.
+The next development step is to apply the initial Supabase migration, configure
+Auth, and then build signup/login/profile wiring before creating blog features.
 
 ## Current Root Layout
 
@@ -41,12 +50,17 @@ Row Level Security policies, and authentication/profile wiring.
 | `README.md` | Markdown | Project orientation and start guide | Main project overview and development plan. |
 | `.node-version` | Node version marker | Records the Node version used for the initial app setup | `v24.16.0`. |
 | `.gitignore` | Git ignore rules | Prevents local/generated files from being committed | Includes `.DS_Store`, `node_modules/`, `.next/`, `.env.local`, logs, and build output. |
+| `.env.example` | Environment template | Documents required environment variables | Safe to commit; contains placeholders only. |
 | `docs/proposal/Proposal.docx` | Word document | Master proposal and technical development plan | Most detailed source. Word metadata reports 49 pages and 8,412 words. |
 | `docs/proposal/ELLI Blogging Platform Proposal.pdf` | PDF | Proposal/export copy | 8-page PDF export. Likely intended for sharing or submission. |
 | `docs/proposal/Proposal & Project Design.pdf` | PDF | Proposal/project design export | 8-page PDF export. Likely another shareable version. |
 | `web/package.json` | npm package manifest | Next.js app dependency and script definition | Created with `create-next-app@16.2.9`. |
 | `web/src/app/` | Next.js App Router source | Initial route, layout, global styles, and favicon | Default starter app; not yet customized for ELLI. |
+| `web/src/lib/supabase/` | Supabase client helpers | Browser and server client factories | Uses publishable key and cookie-aware SSR client setup. |
+| `web/.env.example` | Web environment template | Documents variables needed by the Next.js app | Safe to commit; real local values stay in ignored `web/.env.local`. |
 | `web/package-lock.json` | npm lockfile | Reproducible dependency install record | Should be committed. |
+| `supabase/README.md` | Supabase setup guide | Explains how to apply the migration and handle secrets | Includes security reminders. |
+| `supabase/migrations/20260612143000_initial_schema.sql` | SQL migration | Creates initial tables, RLS policies, auth trigger, and storage bucket | Must still be run in Supabase SQL Editor or through Supabase CLI. |
 | `.DS_Store` | macOS metadata | Finder-generated file | Not part of the project. Should usually be ignored by Git. |
 
 Important file checks from the local folder:
@@ -60,6 +74,8 @@ Important file checks from the local folder:
 - The initial planning workspace commit has been made.
 - The Next.js app has been generated and committed in
   `705ec87 Create Next.js web app`.
+- The README was updated with Next.js setup progress in
+  `0497923 Update README with Next.js setup progress`.
 - Node.js was not available on the original PATH, so Node `v24.16.0` was
   downloaded locally for setup and recorded in `.node-version`.
 
@@ -201,6 +217,7 @@ ELLI Blogging Platform/
       security-checklist.md
       accessibility-checklist.md
   web/
+    .env.example
     package.json
     package-lock.json
     next.config.ts
@@ -208,9 +225,12 @@ ELLI Blogging Platform/
       app/
       components/
       lib/
+        supabase/
       types/
   supabase/
+    README.md
     migrations/
+      20260612143000_initial_schema.sql
     seed.sql
   .env.example
 ```
@@ -225,16 +245,24 @@ files. The `web/` subfolder approach is safer.
 ## Where To Start
 
 The project foundation has now been started. Git, `.gitignore`,
-`.node-version`, `docs/proposal/`, and the initial `web/` Next.js app are done.
+`.node-version`, `docs/proposal/`, the initial `web/` Next.js app, Supabase
+environment templates, Supabase client helpers, and the first local migration
+draft are done.
 
 The immediate next starting point is:
 
-1. Create a Supabase project for the prototype.
-2. Add `.env.example` at the project root.
-3. Add local environment values in `web/.env.local`.
-4. Create the first `profiles` and `posts` schema draft.
-5. Enable Row Level Security early.
-6. Implement authentication and profiles before blog features.
+1. Apply `supabase/migrations/20260612143000_initial_schema.sql` in the
+   Supabase SQL Editor.
+2. Confirm the `profiles`, `posts`, `post_status_history`, and
+   `deletion_requests` tables were created.
+3. Confirm the `post-images` storage bucket was created.
+4. In Supabase Auth, review email confirmation and redirect URL settings.
+5. Create the signup/login/logout pages in Next.js.
+6. Connect signup to Supabase Auth and pass profile consent metadata.
+7. Test that only `@angelo.edu` addresses can register.
+8. Manually assign the first admin role in the `profiles` table.
+9. Implement protected student/admin route checks.
+10. Build the student dashboard and post creation flow.
 
 This order matters because every later feature depends on user identity,
 authorization, and database access rules.
@@ -327,13 +355,20 @@ Current npm audit note:
 
 ### Step 3: Create Supabase Project And Environment Files
 
-Create a Supabase project for the prototype.
+Completed locally. The Supabase project has been created in the Supabase
+Dashboard, and the local project now knows how to connect to it.
 
-Then add a root-level `.env.example` with placeholders:
+Created files:
 
-```bash
+- `.env.example`
+- `web/.env.example`
+- ignored local file: `web/.env.local`
+
+Environment variable names:
+
+```env
 NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 ```
 
@@ -341,26 +376,55 @@ Rules:
 
 - Commit `.env.example`.
 - Never commit `.env.local`.
-- Use the anon key in browser-safe code.
+- Use the publishable key in browser-safe code.
 - Never expose `SUPABASE_SERVICE_ROLE_KEY` to the browser.
 - Use service role only in trusted server-side scripts or protected admin flows,
   and only when truly needed.
+- Rotate any service role key that has been shared outside the Supabase
+  Dashboard before production.
+
+Installed packages in `web/`:
+
+- `@supabase/supabase-js`
+- `@supabase/ssr`
+
+Added app helpers:
+
+- `web/src/lib/supabase/client.ts`
+- `web/src/lib/supabase/server.ts`
 
 ### Step 4: Implement The Database Before The UI Gets Large
 
-Start with the smallest schema that supports the core workflow.
+Started locally. The first SQL migration is:
 
-Recommended initial tables:
+```text
+supabase/migrations/20260612143000_initial_schema.sql
+```
+
+This migration creates the smallest schema that supports the core workflow.
+
+Initial tables:
 
 1. `profiles`
 2. `posts`
 3. `post_status_history`
 4. `deletion_requests`
 
-For the first working milestone, `profiles` and `posts` are mandatory.
-`post_status_history` is strongly recommended because it gives accountability
-for admin actions. `deletion_requests` can be added after the core workflow if
-time is tight.
+The migration also adds:
+
+- `post_review_status` enum.
+- `updated_at` triggers.
+- `handle_new_user()` trigger for Supabase Auth profile creation.
+- `@angelo.edu` registration enforcement at the database trigger level.
+- `is_admin()` helper for RLS checks.
+- RLS policies for public, student, and admin access.
+- Private `post-images` storage bucket.
+- Storage policies for student-owned uploads, admin access, and public reads of
+  approved/published post images.
+
+This migration has been written to the repository, but it has not yet been
+applied to the remote Supabase database from this machine. Apply it through
+Supabase SQL Editor using the instructions in `supabase/README.md`.
 
 ### Step 5: Implement Authentication And Profiles
 
@@ -585,7 +649,7 @@ Should:
 
 Purpose: Store application-level user profile data connected to Supabase Auth.
 
-Recommended fields:
+Initial migration fields:
 
 | Column | Type | Notes |
 | --- | --- | --- |
@@ -594,10 +658,10 @@ Recommended fields:
 | `full_name` | `text` | User display name. |
 | `role` | `text` | `student` or `admin`. |
 | `privacy_consent_accepted` | `boolean` | Signup consent accepted. |
-| `privacy_consent_at` | `timestamp` | Consent timestamp. |
+| `privacy_consent_at` | `timestamptz` | Consent timestamp. |
 | `privacy_consent_version` | `text` | Version of consent language. |
-| `created_at` | `timestamp` | Creation timestamp. |
-| `updated_at` | `timestamp` | Last update timestamp. |
+| `created_at` | `timestamptz` | Creation timestamp. |
+| `updated_at` | `timestamptz` | Last update timestamp. |
 
 Important policy:
 
@@ -611,7 +675,7 @@ Important policy:
 Purpose: Store blog post content, image reference, consent, review state, and
 publication state.
 
-Recommended fields:
+Initial migration fields:
 
 | Column | Type | Notes |
 | --- | --- | --- |
@@ -619,26 +683,20 @@ Recommended fields:
 | `author_id` | `uuid` | References `profiles.id`. |
 | `title` | `text` | Post title. |
 | `slug` | `text` | URL-friendly identifier. |
+| `excerpt` | `text` | Optional short summary, limited to 220 characters. |
 | `content` | `text` | Main blog content. |
-| `category` | `text` | Optional activity/category. |
 | `featured_image_path` | `text` | Supabase Storage path. |
-| `image_alt_text` | `text` | Accessibility text. |
-| `review_status` | `text` | Draft/submitted/revision/approved/rejected/archived. |
+| `featured_image_alt` | `text` | Accessibility text, limited to 180 characters. |
+| `review_status` | `post_review_status` | Draft/submitted/revision requested/approved/rejected/archived. |
 | `is_published` | `boolean` | Public visibility flag. |
+| `submitted_at` | `timestamptz` | Submission timestamp. |
+| `reviewed_at` | `timestamptz` | Review timestamp. |
+| `published_at` | `timestamptz` | Publication timestamp. |
 | `admin_note` | `text` | Staff note for revision/rejection. |
 | `photo_consent_accepted` | `boolean` | Photo-use consent. |
-| `publication_consent_accepted` | `boolean` | Public-posting consent. |
-| `submission_consent_at` | `timestamp` | Submission consent timestamp. |
-| `submission_consent_version` | `text` | Submission consent version. |
-| `submitted_at` | `timestamp` | Submission timestamp. |
-| `approved_at` | `timestamp` | Approval timestamp. |
-| `approved_by` | `uuid` | Admin who approved. |
-| `published_at` | `timestamp` | Publication timestamp. |
-| `published_by` | `uuid` | Admin who published. |
-| `rejected_at` | `timestamp` | Rejection timestamp. |
-| `archived_at` | `timestamp` | Archive timestamp. |
-| `created_at` | `timestamp` | Creation timestamp. |
-| `updated_at` | `timestamp` | Last update timestamp. |
+| `public_posting_consent_accepted` | `boolean` | Public-posting consent. |
+| `created_at` | `timestamptz` | Creation timestamp. |
+| `updated_at` | `timestamptz` | Last update timestamp. |
 
 Recommended constraints:
 
@@ -651,19 +709,17 @@ Recommended constraints:
 
 Purpose: Track status and publication changes for accountability.
 
-Recommended fields:
+Initial migration fields:
 
 | Column | Type | Notes |
 | --- | --- | --- |
 | `id` | `uuid` | History record ID. |
 | `post_id` | `uuid` | Related post. |
 | `changed_by` | `uuid` | User who changed status. |
-| `previous_status` | `text` | Old review status. |
-| `new_status` | `text` | New review status. |
-| `previous_is_published` | `boolean` | Old publication state. |
-| `new_is_published` | `boolean` | New publication state. |
+| `from_status` | `post_review_status` | Old review status. |
+| `to_status` | `post_review_status` | New review status. |
 | `note` | `text` | Optional note. |
-| `created_at` | `timestamp` | Change timestamp. |
+| `created_at` | `timestamptz` | Change timestamp. |
 
 This table is very useful for explaining administrative accountability during
 the final demo.
@@ -672,19 +728,20 @@ the final demo.
 
 Purpose: Allow students to request removal of published posts.
 
-Recommended fields:
+Initial migration fields:
 
 | Column | Type | Notes |
 | --- | --- | --- |
 | `id` | `uuid` | Request ID. |
 | `post_id` | `uuid` | Related post. |
-| `requester_id` | `uuid` | Student requesting deletion. |
+| `requested_by` | `uuid` | Student requesting deletion. |
 | `reason` | `text` | Student-provided reason. |
 | `status` | `text` | Pending/approved/denied/completed. |
-| `admin_note` | `text` | Admin response. |
-| `resolved_by` | `uuid` | Admin who resolved request. |
-| `created_at` | `timestamp` | Request timestamp. |
-| `resolved_at` | `timestamp` | Resolution timestamp. |
+| `admin_response` | `text` | Admin response. |
+| `reviewed_by` | `uuid` | Admin who reviewed request. |
+| `reviewed_at` | `timestamptz` | Review timestamp. |
+| `created_at` | `timestamptz` | Request timestamp. |
+| `updated_at` | `timestamptz` | Last update timestamp. |
 
 If time is short, implement this after the main submission/review/publish
 workflow.
@@ -697,7 +754,6 @@ Recommended statuses:
 | --- | --- | --- |
 | `draft` | Student is still writing. | No |
 | `submitted` | Student submitted for review. | No |
-| `under_review` | Admin is reviewing. | No |
 | `revision_requested` | Admin requested changes. | No |
 | `approved` | Content approved by admin. | No by itself |
 | `rejected` | Content rejected. | No |
@@ -849,6 +905,18 @@ Definition of done:
 - RLS enabled.
 - Basic policies drafted.
 
+Current progress:
+
+- Done locally: Supabase project URL and publishable key are in ignored
+  `web/.env.local`.
+- Done locally: root and web `.env.example` files exist.
+- Done locally: `@supabase/supabase-js` and `@supabase/ssr` are installed.
+- Done locally: browser/server Supabase client helpers exist.
+- Done locally: initial SQL migration has been drafted.
+- Pending remote action: run the SQL migration in Supabase SQL Editor.
+- Pending verification: confirm remote tables, RLS policies, auth trigger, and
+  `post-images` bucket exist in Supabase.
+
 ### Milestone 2: Authentication
 
 Definition of done:
@@ -992,10 +1060,11 @@ Planned phases:
 | Phase 5 | June 28 - July 3 | Final polish, report, demo, submission. |
 
 As of June 12, 2026, the project should ideally be in Phase 2. The project root
-has now been initialized, proposal files have been organized, and the initial
-Next.js app has been generated and committed in `web/`. The practical next step
-is to move directly to Milestone 1: Supabase foundation, environment setup,
-database schema, RLS, and authentication/profile wiring.
+has now been initialized, proposal files have been organized, the initial
+Next.js app has been generated and committed in `web/`, and the local Supabase
+foundation has been prepared. The practical next step is to apply the Supabase
+migration, verify the database policies, and then move directly into
+authentication/profile wiring.
 
 ## Recommended Immediate Task List
 
@@ -1010,20 +1079,26 @@ Start here:
 7. [x] Confirm `npm run lint` works.
 8. [x] Confirm `npm run build` works.
 9. [x] Commit the generated Next.js app.
-10. [ ] Create Supabase project.
-11. [ ] Add `.env.example`.
-12. [ ] Create `profiles` and `posts` migrations.
-13. [ ] Enable RLS.
-14. [ ] Implement signup/login/logout.
-15. [ ] Implement role loading.
-16. [ ] Implement student dashboard.
-17. [ ] Implement create/edit post form.
-18. [ ] Implement submit for review.
-19. [ ] Implement admin dashboard.
-20. [ ] Implement approve/publish flow.
-21. [ ] Implement public blog pages.
-22. [ ] Write setup and handoff docs.
-23. [ ] Prepare final demo.
+10. [x] Create Supabase project.
+11. [x] Add `.env.example`.
+12. [x] Add local `web/.env.local` with public Supabase values.
+13. [x] Install Supabase client packages.
+14. [x] Add Supabase browser/server client helpers.
+15. [x] Create initial `profiles`, `posts`, status history, and deletion request migration.
+16. [x] Draft RLS and storage policies in the migration.
+17. [ ] Apply the migration in Supabase SQL Editor.
+18. [ ] Confirm remote tables, RLS policies, auth trigger, and storage bucket.
+19. [ ] Configure Supabase Auth redirect URLs.
+20. [ ] Implement signup/login/logout.
+21. [ ] Implement role loading.
+22. [ ] Implement student dashboard.
+23. [ ] Implement create/edit post form.
+24. [ ] Implement submit for review.
+25. [ ] Implement admin dashboard.
+26. [ ] Implement approve/publish flow.
+27. [ ] Implement public blog pages.
+28. [ ] Write setup and handoff docs.
+29. [ ] Prepare final demo.
 
 The most important first coding milestone is not the homepage. It is:
 
@@ -1057,7 +1132,7 @@ should wait until CIS/ASU review confirms:
 | RLS misconfiguration | Could expose private student content. | Enable RLS early and test each role separately. |
 | Image privacy | Uploaded images may contain sensitive information or people without consent. | Require consent, show warnings, and require admin review before publication. |
 | Service role leakage | Would create serious backend security risk. | Never expose service role key to browser code. |
-| Timeline compression | The app code has not started in this folder yet. | Build vertical slices and avoid non-MVP features. |
+| Timeline compression | The app foundation exists, but core workflows are not implemented yet. | Build vertical slices and avoid non-MVP features. |
 | Future maintenance | CIS may need to maintain the app after the initial developer leaves. | Keep documentation, migrations, and handoff guides current. |
 
 ## Final Demo Target
