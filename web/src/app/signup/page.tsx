@@ -28,7 +28,7 @@ export default async function SignupPage() {
               Create your moderated ELLI blogging account.
             </h1>
             <p className="max-w-xl text-base leading-7 text-slate-600">
-              Use your Angelo State email to join the prototype workflow for
+              Use your ASU email to join the prototype workflow for
               drafting, submitting, and tracking student blog posts.
             </p>
           </div>

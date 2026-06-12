@@ -30,7 +30,7 @@ export function SignupForm() {
 
       <div className="space-y-2">
         <label htmlFor="email" className="text-sm font-medium text-slate-800">
-          Angelo State email
+          ASU email
         </label>
         <input
           id="email"

@@ -33,7 +33,7 @@ export async function signUpAction(
   if (!fullName || !email || !password) {
     return {
       status: "error",
-      message: "Please enter your name, Angelo State email, and password.",
+      message: "Please enter your name, ASU email, and password.",
     };
   }
 
@@ -87,7 +87,8 @@ export async function signUpAction(
 
   return {
     status: "success",
-    message: "Check your Angelo State email to confirm your account.",
+    message:
+      "Account created. If your email is already confirmed, you can sign in now. Otherwise, check your ASU email.",
   };
 }
 

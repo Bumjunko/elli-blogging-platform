@@ -78,7 +78,7 @@ export default async function Home() {
                 <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-[#e8f1f9] font-semibold text-[#174a7c]">
                   1
                 </span>
-                Student signs up with an Angelo State email.
+                Student signs up with an ASU email.
               </li>
               <li className="flex gap-3">
                 <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-[#e8f1f9] font-semibold text-[#174a7c]">
