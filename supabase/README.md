@@ -9,6 +9,7 @@ Platform.
 - The publishable key is configured locally in `web/.env.local`.
 - The service role key is intentionally not stored in this repository.
 - Supabase CLI has been initialized with `supabase/config.toml`.
+- Supabase CLI login and project linking are complete.
 - The initial migration has been applied to the remote Supabase database.
 - Direct IPv6 database access was not available from this machine, so the
   migration was applied through the session pooler host for this project.
@@ -21,21 +22,22 @@ The CLI is currently run through:
 npx supabase@latest
 ```
 
-The local CLI project has been initialized:
+The local CLI project has been initialized and linked:
 
 ```bash
 npx supabase@latest init
-```
-
-Remote linking is not complete yet because `supabase link` requires a Supabase
-Personal Access Token. To complete the link later:
-
-```bash
 npx supabase@latest login --token <personal-access-token>
 npx supabase@latest link --project-ref nohzklegahxyakthvosg
 ```
 
 Use the database password only when the CLI prompts for it. Do not commit it.
+The token and database password are not stored in this repository.
+
+Linked-project commands can now be used from the project root. For example:
+
+```bash
+npx supabase@latest db push --linked --dry-run
+```
 
 ## Apply The Initial Schema
 
@@ -49,7 +51,8 @@ Status: applied to the remote database on June 12, 2026.
 
 Verification completed:
 
-- `supabase db push --dry-run` reports that the remote database is up to date.
+- `supabase db push --linked --dry-run` reports that the remote database is up
+  to date.
 - The public Data API returns `200 OK` for `/rest/v1/posts?select=id&limit=1`.
 - These public tables exist with RLS enabled:
   - `profiles`
@@ -74,9 +77,8 @@ Supabase Dashboard:
    - `deletion_requests`
 7. Confirm the `post-images` storage bucket exists.
 
-After `supabase link` is completed with a Personal Access Token, this same
-folder can be used as the migration source for normal linked-project CLI
-commands.
+Because `supabase link` is complete, this folder can be used as the migration
+source for normal linked-project CLI commands.
 
 ## Security Notes
 

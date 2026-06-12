@@ -34,6 +34,8 @@ Root cleanup has been completed:
 - The first Supabase migration has been drafted under `supabase/migrations/`.
 - Supabase setup notes have been added under `supabase/README.md`.
 - Supabase CLI has been initialized under `supabase/config.toml`.
+- Supabase CLI login and `supabase link` have been completed for project
+  `nohzklegahxyakthvosg`.
 - The initial Supabase migration has been applied to the remote Supabase
   database.
 - Remote verification confirms the four application tables have RLS enabled and
@@ -64,8 +66,8 @@ signup/login/profile wiring before creating blog features.
 | `web/.env.example` | Web environment template | Documents variables needed by the Next.js app | Safe to commit; real local values stay in ignored `web/.env.local`. |
 | `web/package-lock.json` | npm lockfile | Reproducible dependency install record | Should be committed. |
 | `supabase/.gitignore` | Supabase local ignore rules | Prevents local Supabase temp files and env files from being committed | Created by `supabase init`. |
-| `supabase/config.toml` | Supabase CLI config | Local Supabase CLI configuration | Created by `supabase init`; configured for local Next.js on port 3000. |
-| `supabase/README.md` | Supabase setup guide | Explains CLI status, migration verification, and secret handling | Includes security reminders. |
+| `supabase/config.toml` | Supabase CLI config | Local Supabase CLI configuration | Created by `supabase init`; linked to the hosted project; configured for local Next.js on port 3000. |
+| `supabase/README.md` | Supabase setup guide | Explains CLI status, linked migration verification, and secret handling | Includes security reminders. |
 | `supabase/migrations/20260612143000_initial_schema.sql` | SQL migration | Creates initial tables, RLS policies, auth trigger, and storage bucket | Applied to the remote Supabase database on June 12, 2026. |
 | `supabase/seed.sql` | Supabase seed file | Placeholder for future demo seed data | Keeps local `supabase db reset` seed path stable. |
 | `.DS_Store` | macOS metadata | Finder-generated file | Not part of the project. Should usually be ignored by Git. |
@@ -436,15 +438,15 @@ was used.
 
 Remote verification completed:
 
-- `supabase db push --dry-run` reports that the remote database is up to date.
+- `supabase db push --linked --dry-run` reports that the remote database is up
+  to date.
 - The public Data API returns `200 OK` for `/rest/v1/posts?select=id&limit=1`.
 - `profiles`, `posts`, `post_status_history`, and `deletion_requests` exist
   with RLS enabled.
 - The `post-images` bucket exists, is private, and has a 5 MB file size limit.
 
-CLI note: `supabase init` is complete. `supabase link` still requires a
-Supabase Personal Access Token, so linked-project CLI commands are not fully
-enabled yet.
+CLI note: `supabase init`, `supabase login`, and `supabase link` are complete.
+Linked-project CLI commands can now be run from the project root.
 
 ### Step 5: Implement Authentication And Profiles
 
@@ -933,13 +935,13 @@ Current progress:
 - Done locally: `@supabase/supabase-js` and `@supabase/ssr` are installed.
 - Done locally: browser/server Supabase client helpers exist.
 - Done locally: Supabase CLI has been initialized with `supabase/config.toml`.
+- Done locally: Supabase CLI login and `supabase link` are complete.
 - Done locally: initial SQL migration has been drafted and committed.
 - Done remotely: initial SQL migration has been applied to Supabase.
 - Done remotely: remote database is up to date according to `supabase db push
-  --dry-run`.
+  --linked --dry-run`.
 - Done remotely: the four application tables have RLS enabled.
 - Done remotely: the `post-images` bucket exists as a private 5 MB bucket.
-- Pending CLI auth: `supabase link` requires a Supabase Personal Access Token.
 
 ### Milestone 2: Authentication
 
