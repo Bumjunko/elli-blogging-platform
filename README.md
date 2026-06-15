@@ -5,7 +5,7 @@ Blogging Platform, a moderated student blogging system for the English Language
 Learners' Institute (ELLI) under the Center for International Studies (CIS) at
 Angelo State University.
 
-Last reviewed: June 12, 2026
+Last reviewed: June 15, 2026
 
 ## Current Status
 
@@ -43,7 +43,10 @@ Root cleanup has been completed:
 - The Next.js home page has been replaced with an ELLI-oriented app entry
   screen.
 - Supabase Auth signup, login, logout, and callback handling have been added.
+- Signup confirmation and invalid-login messages have been clarified.
 - `/dashboard` is now protected and redirects signed-out visitors to `/login`.
+- `/dashboard/posts/new` has been added for text-only draft creation and
+  submit-for-review.
 
 This is now an application codebase foundation, but not yet the ELLI blogging
 MVP. The Supabase database foundation, first authentication slice, dashboard
@@ -91,6 +94,19 @@ Important file checks from the local folder:
   `705ec87 Create Next.js web app`.
 - The README was updated with Next.js setup progress in
   `0497923 Update README with Next.js setup progress`.
+- Supabase foundation files were committed in
+  `ad24684 Add Supabase foundation`.
+- Supabase CLI setup and remote migration application were committed in
+  `56337e0 Apply Supabase migration via CLI`.
+- Linked Supabase CLI status was documented in
+  `455baa8 Document linked Supabase CLI setup`.
+- Supabase Auth signup/login/dashboard wiring was committed in
+  `0deea4c Add Supabase auth flow`.
+- Signup and login user-facing message updates were committed in
+  `46fe2d6 Clarify signup confirmation message` and
+  `6758782 Improve invalid login message`.
+- Student text-post draft/submission flow was committed in
+  `7e52e57 Add student post creation flow`.
 - Node.js was not available on the original PATH, so Node `v24.16.0` was
   downloaded locally for setup and recorded in `.node-version`.
 
@@ -1118,12 +1134,13 @@ Planned phases:
 | Phase 4 | June 22 - June 27 | Policy, security, accessibility, documentation. |
 | Phase 5 | June 28 - July 3 | Final polish, report, demo, submission. |
 
-As of June 12, 2026, the project should ideally be in Phase 2. The project root
-has now been initialized, proposal files have been organized, the initial
-Next.js app has been generated and committed in `web/`, and the local Supabase
-foundation has been prepared and applied to the remote database. The practical
-next step is to configure Supabase Auth settings and move directly into
-authentication/profile wiring.
+As of June 15, 2026, the project is entering Phase 3. The project root has been
+initialized, proposal files have been organized, the initial Next.js app has
+been generated and committed in `web/`, the Supabase foundation has been
+prepared and applied to the remote database, authentication is implemented, and
+the first text-only student draft/submission workflow exists. The practical next
+step is to test the flow end to end with a confirmed `@angelo.edu` account, add
+image upload, and then begin the admin review workflow.
 
 ## Recommended Immediate Task List
 
