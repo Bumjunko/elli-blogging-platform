@@ -74,6 +74,9 @@ Root cleanup has been completed:
   ESLint and a production Next.js build.
 - Testing on June 30, 2026 confirms `npm test`, `git diff --check`, and the
   main local route smoke tests pass.
+- Manual end-to-end testing on June 30, 2026 confirms a student post can be
+  created, submitted, reviewed as an admin, published, and viewed on the public
+  blog.
 - The latest implementation batch has been committed and pushed to GitHub:
   `23a7284 Implement admin review and public blog workflows`.
 
@@ -1191,10 +1194,11 @@ Current progress:
 - Done in verification: Supabase project woke from `INACTIVE`/`COMING_UP` to
   `ACTIVE_HEALTHY`, REST returned `200`, and the remote database reports that
   migrations are up to date.
-- Pending manual test: complete a real student signup/login/submission flow
-  with a confirmed `@angelo.edu` account.
-- Pending manual test: complete a real admin review, approval, publish, and
-  public blog visibility flow.
+- Done in manual testing: a real user flow was tested from student post
+  creation/submission through admin publish and public blog visibility.
+- Pending manual test: complete negative-path checks such as non-`@angelo.edu`
+  signup rejection, rejected-post visibility, request-revision behavior, and
+  student/admin permission boundaries.
 
 ## Testing Checklist
 
@@ -1243,15 +1247,15 @@ Supabase connectivity check:
 
 Manual student tests still required:
 
-- [ ] Student can register with `@angelo.edu`.
+- [x] Student can register with `@angelo.edu`.
 - [ ] Student cannot register with a non-`@angelo.edu` email.
 - [ ] Student can confirm the account through the email inbox.
-- [ ] Student can log in.
+- [x] Student can log in.
 - [ ] Student can log out.
 - [ ] Student can accept privacy consent.
-- [ ] Student can create a draft.
-- [ ] Student can upload a featured image and alt text.
-- [ ] Student can submit a post.
+- [x] Student can create a draft.
+- [x] Student can upload a featured image and alt text.
+- [x] Student can submit a post.
 - [ ] Student cannot submit without required fields.
 - [ ] Student cannot submit without consent.
 - [ ] Student can see their own posts.
@@ -1260,14 +1264,14 @@ Manual student tests still required:
 
 Manual admin tests still required:
 
-- [ ] Admin can log in.
-- [ ] Admin can access admin dashboard.
+- [x] Admin can log in.
+- [x] Admin can access admin dashboard.
 - [ ] Student cannot access admin dashboard.
-- [ ] Admin can view submitted posts.
-- [ ] Admin can open post review page.
+- [x] Admin can view submitted posts.
+- [x] Admin can open post review page.
 - [ ] Admin can request revision.
-- [ ] Admin can approve.
-- [ ] Admin can publish an approved post.
+- [x] Admin can approve.
+- [x] Admin can publish an approved post.
 - [ ] Admin cannot publish a rejected post.
 - [ ] Admin can reject.
 - [ ] Admin note appears to student when revision is requested.
@@ -1277,7 +1281,7 @@ Manual public tests still required:
 
 - [x] Public visitor can view homepage.
 - [x] Public visitor can view blog list route.
-- [ ] Public visitor can view a real published post.
+- [x] Public visitor can view a real published post.
 - [ ] Public visitor cannot view a real submitted post by URL.
 - [ ] Public visitor cannot view a real rejected post by URL.
 - [x] Public visitor cannot access student dashboard while signed out.
