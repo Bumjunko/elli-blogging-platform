@@ -1126,13 +1126,12 @@ Current progress:
   `/dashboard/posts/[postId]/edit`.
 - Done in code: a follow-up Supabase migration permits student-owned status
   history inserts while keeping RLS restrictions narrow.
+- Done in database: `20260629120000_allow_student_status_history_logging.sql`
+  has been applied to the linked remote Supabase project.
 - Pending manual setup: assign the first real admin role in Supabase
   `profiles`.
-- Pending database sync: apply
-  `supabase/migrations/20260629120000_allow_student_status_history_logging.sql`
-  to the remote Supabase project.
-- To apply the pending migration, run this from the project root with the real
-  database password supplied only as a local environment variable:
+- Future migrations can be applied from the project root with the real database
+  password supplied only as a local environment variable:
 
 ```bash
 SUPABASE_DB_PASSWORD="<database-password>" npx -y supabase@latest db push --linked
@@ -1189,13 +1188,13 @@ Current progress:
   slug returns `404`.
 - Done in docs: README now records the latest automated and route smoke test
   results.
+- Done in verification: Supabase project woke from `INACTIVE`/`COMING_UP` to
+  `ACTIVE_HEALTHY`, REST returned `200`, and the remote database reports that
+  migrations are up to date.
 - Pending manual test: complete a real student signup/login/submission flow
   with a confirmed `@angelo.edu` account.
 - Pending manual test: complete a real admin review, approval, publish, and
   public blog visibility flow.
-- Pending network check: Supabase REST verification currently returns HTTP
-  `000` from this local shell, which means the local environment is not reaching
-  the Supabase host during this test run.
 
 ## Testing Checklist
 
@@ -1209,6 +1208,8 @@ Automated checks:
 | `npm run lint` from `web/` | Pass | ESLint completes without reported issues. |
 | `npm run build` from `web/` | Pass | Next.js production build compiles all current routes. |
 | `git diff --check` from project root | Pass | No whitespace errors in the current diff. |
+| `supabase db push --linked --dry-run` | Pass | Remote database is up to date after applying the latest migration. |
+| Supabase migration list | Pass | Remote includes `20260612143000` and `20260629120000`. |
 
 Local route smoke tests:
 
@@ -1238,7 +1239,7 @@ Supabase connectivity check:
 
 | Check | Result | Notes |
 | --- | --- | --- |
-| Public REST request to `/rest/v1/posts?select=id&limit=1` | Blocked in current shell | Returned HTTP `000`, indicating the local test environment could not reach the Supabase host during this run. |
+| Public REST request to `/rest/v1/posts?select=id&limit=1` | Pass | Returned HTTP `200` after the Supabase project became `ACTIVE_HEALTHY`. |
 
 Manual student tests still required:
 
@@ -1293,7 +1294,7 @@ Security checks:
 - [ ] Public user cannot query private posts.
 - [ ] Environment variables are not exposed in client bundles beyond intended
   `NEXT_PUBLIC_*` values.
-- [ ] RLS policies are active after the latest status-history migration is
+- [x] RLS policies are active after the latest status-history migration is
   applied remotely.
 
 Accessibility checks:
