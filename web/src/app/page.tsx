@@ -14,7 +14,13 @@ export default async function Home() {
           <p className="text-sm font-semibold text-[#174a7c]">
             ELLI Blogging Platform
           </p>
-          <nav className="flex gap-3">
+          <nav className="flex flex-wrap gap-3">
+            <Link
+              href="/blog"
+              className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-100"
+            >
+              Student blog
+            </Link>
             {user ? (
               <Link
                 href="/dashboard"
@@ -54,6 +60,12 @@ export default async function Home() {
               anything becomes public.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
+              <Link
+                href="/blog"
+                className="rounded-md border border-slate-300 bg-white px-5 py-3 text-center text-sm font-semibold text-slate-800 transition hover:bg-slate-100"
+              >
+                Read public posts
+              </Link>
               <Link
                 href={user ? "/dashboard" : "/signup"}
                 className="rounded-md bg-[#174a7c] px-5 py-3 text-center text-sm font-semibold text-white transition hover:bg-[#10385f]"

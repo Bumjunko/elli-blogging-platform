@@ -3,27 +3,44 @@
 import { useActionState } from "react";
 import {
   createPostAction,
+  updatePostAction,
   type PostFormState,
 } from "@/app/dashboard/posts/actions";
 import { SubmitButton } from "@/components/auth/submit-button";
 
-const initialState: PostFormState = {
-  status: "idle",
-  message: "",
-  values: {
-    title: "",
-    excerpt: "",
-    content: "",
-    photoConsent: false,
-    publicPostingConsent: false,
-  },
+type PostEditorFormProps = {
+  mode?: "create" | "edit";
+  postId?: string;
+  initialValues?: Partial<PostFormState["values"]>;
 };
 
-export function PostEditorForm() {
-  const [state, formAction] = useActionState(createPostAction, initialState);
+export function PostEditorForm({
+  mode = "create",
+  postId,
+  initialValues,
+}: PostEditorFormProps) {
+  const action = mode === "edit" ? updatePostAction : createPostAction;
+  const initialState: PostFormState = {
+    status: "idle",
+    message: "",
+    values: {
+      title: initialValues?.title ?? "",
+      excerpt: initialValues?.excerpt ?? "",
+      content: initialValues?.content ?? "",
+      featuredImageAlt: initialValues?.featuredImageAlt ?? "",
+      featuredImagePath: initialValues?.featuredImagePath ?? null,
+      photoConsent: initialValues?.photoConsent ?? false,
+      publicPostingConsent: initialValues?.publicPostingConsent ?? false,
+    },
+  };
+  const [state, formAction] = useActionState(action, initialState);
 
   return (
-    <form action={formAction} className="space-y-6">
+    <form action={formAction} encType="multipart/form-data" className="space-y-6">
+      {mode === "edit" ? (
+        <input type="hidden" name="postId" value={postId} />
+      ) : null}
+
       <div className="space-y-2">
         <label htmlFor="title" className="text-sm font-medium text-slate-800">
           Title
@@ -75,6 +92,61 @@ export function PostEditorForm() {
         />
       </div>
 
+      <div className="space-y-4 rounded-lg border border-slate-200 bg-slate-50 p-4">
+        <div className="space-y-2">
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+            <label
+              htmlFor="featuredImage"
+              className="text-sm font-medium text-slate-800"
+            >
+              Featured image
+            </label>
+            <span className="text-xs text-slate-500">
+              JPG, PNG, or WebP, 5 MB max
+            </span>
+          </div>
+          <input
+            id="featuredImage"
+            name="featuredImage"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            className="block w-full rounded-md border border-slate-300 bg-white text-sm text-slate-700 file:mr-4 file:h-10 file:border-0 file:bg-[#174a7c] file:px-4 file:text-sm file:font-semibold file:text-white hover:file:bg-[#10385f]"
+          />
+          {state.values.featuredImagePath ? (
+            <p className="text-xs leading-5 text-slate-600">
+              A featured image is already attached. Uploading a new file will
+              replace it.
+            </p>
+          ) : (
+            <p className="text-xs leading-5 text-slate-600">
+              Required before submitting for review. You can save a draft before
+              adding an image.
+            </p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+            <label
+              htmlFor="featuredImageAlt"
+              className="text-sm font-medium text-slate-800"
+            >
+              Image alt text
+            </label>
+            <span className="text-xs text-slate-500">180 max</span>
+          </div>
+          <input
+            id="featuredImageAlt"
+            name="featuredImageAlt"
+            type="text"
+            maxLength={180}
+            defaultValue={state.values.featuredImageAlt}
+            placeholder="Describe the image for readers using assistive technology"
+            className="h-11 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-[#174a7c] focus:ring-2 focus:ring-[#174a7c]/20"
+          />
+        </div>
+      </div>
+
       <div className="space-y-3 rounded-lg border border-slate-200 bg-slate-50 p-4">
         <label className="flex items-start gap-3 text-sm leading-6 text-slate-700">
           <input
@@ -112,11 +184,11 @@ export function PostEditorForm() {
       <div className="flex flex-col gap-3 sm:flex-row">
         <SubmitButton
           name="intent"
-          pendingLabel="Saving draft..."
+          pendingLabel={mode === "edit" ? "Updating draft..." : "Saving draft..."}
           value="draft"
           variant="secondary"
         >
-          Save draft
+          {mode === "edit" ? "Update draft" : "Save draft"}
         </SubmitButton>
         <SubmitButton
           name="intent"

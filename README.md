@@ -5,7 +5,7 @@ Blogging Platform, a moderated student blogging system for the English Language
 Learners' Institute (ELLI) under the Center for International Studies (CIS) at
 Angelo State University.
 
-Last reviewed: June 15, 2026
+Last reviewed: June 30, 2026
 
 ## Current Status
 
@@ -45,18 +45,46 @@ Root cleanup has been completed:
 - Supabase Auth signup, login, logout, and callback handling have been added.
 - Signup confirmation and invalid-login messages have been clarified.
 - `/dashboard` is now protected and redirects signed-out visitors to `/login`.
-- `/dashboard/posts/new` has been added for text-only draft creation and
-  submit-for-review.
+- `/dashboard/posts/new` has been added for draft creation, featured image
+  upload, alt text, and submit-for-review.
+- `/dashboard/posts/[postId]/edit` has been added so students can edit their
+  own draft or revision-requested posts before submitting them again.
+- `/admin` has been added as a protected admin-only route. Signed-out visitors
+  are redirected to login, and non-admin users are redirected back to the
+  dashboard.
+- The student dashboard now shows an `Admin review` link only when the signed-in
+  profile has the `admin` role.
+- `/admin` now shows review queue counts and a list of review-ready posts with
+  author, status, submitted date, image, alt text, and consent indicators.
+- `/admin/posts/[postId]` now shows the full review detail view, including
+  content, author, featured image, alt text, consent checklist, dates, admin
+  note, and status history.
+- `/admin/posts/[postId]` now supports request revision, approve, reject, and
+  publish actions with confirmation, admin notes, status updates, and status
+  history logging.
+- Status history logging now covers draft creation, first submission,
+  revision resubmission, admin revision requests, approval, rejection, and
+  publication. Students can see status history on their edit/status page, and
+  admins can see it on the review detail page.
+- `/blog` now shows the public student blog list for approved and published
+  posts only.
+- `/blog/[slug]` now shows public post detail pages and returns 404 for posts
+  that are not approved and published.
+- A repeatable `npm test` script has been added in `web/package.json`; it runs
+  ESLint and a production Next.js build.
+- Testing on June 30, 2026 confirms `npm test`, `git diff --check`, and the
+  main local route smoke tests pass.
 
 This is now an application codebase foundation, but not yet the ELLI blogging
 MVP. The Supabase database foundation, first authentication slice, dashboard
-shell, and new-post draft/submission flow now exist. Image upload, post editing,
-admin review, public blog pages, and deployment configuration are not
+shell, new-post draft/submission flow, draft edit flow, featured image upload
+with alt text, admin access guard, admin dashboard list, admin review
+detail/actions, status history logging, public blog list/detail pages, and
+basic automated verification now exist. Deployment configuration is not
 implemented yet.
 
-The next development step is to test signup/login with a real `@angelo.edu`
-email, create a draft from `/dashboard/posts/new`, submit it for review, and
-then add the image upload workflow.
+The next development step is to test the full workflow with real student and
+admin accounts, then write setup/handoff documentation and prepare deployment.
 
 ## Current Root Layout
 
@@ -69,8 +97,9 @@ then add the image upload workflow.
 | `docs/proposal/Proposal.docx` | Word document | Master proposal and technical development plan | Most detailed source. Word metadata reports 49 pages and 8,412 words. |
 | `docs/proposal/ELLI Blogging Platform Proposal.pdf` | PDF | Proposal/export copy | 8-page PDF export. Likely intended for sharing or submission. |
 | `docs/proposal/Proposal & Project Design.pdf` | PDF | Proposal/project design export | 8-page PDF export. Likely another shareable version. |
-| `web/package.json` | npm package manifest | Next.js app dependency and script definition | Created with `create-next-app@16.2.9`. |
-| `web/src/app/` | Next.js App Router source | Home, signup, login, auth callback, dashboard, new post flow, layout, global styles, and favicon | First auth and text-post submission slices are implemented; image upload is next. |
+| `web/package.json` | npm package manifest | Next.js app dependency and script definition | Includes `dev`, `build`, `start`, `lint`, and `test`; `test` runs lint plus production build. |
+| `web/src/app/` | Next.js App Router source | Home, public blog list/detail, signup, login, auth callback, dashboard, protected admin shell, new/edit post flow, admin review flow, layout, global styles, and favicon | Auth, post submission, draft edit, featured-image upload, admin guard, admin review actions, status history UI, and public blog pages are implemented. |
+| `web/src/lib/posts/` | Post workflow helpers | Shared post status history helper | Used by student and admin server actions to keep workflow logging consistent. |
 | `web/src/lib/supabase/` | Supabase client helpers | Browser and server client factories | Uses publishable key and cookie-aware SSR client setup. |
 | `web/.env.example` | Web environment template | Documents variables needed by the Next.js app | Safe to commit; real local values stay in ignored `web/.env.local`. |
 | `web/package-lock.json` | npm lockfile | Reproducible dependency install record | Should be committed. |
@@ -78,6 +107,7 @@ then add the image upload workflow.
 | `supabase/config.toml` | Supabase CLI config | Local Supabase CLI configuration | Created by `supabase init`; linked to the hosted project; configured for local Next.js on port 3000. |
 | `supabase/README.md` | Supabase setup guide | Explains CLI status, linked migration verification, and secret handling | Includes security reminders. |
 | `supabase/migrations/20260612143000_initial_schema.sql` | SQL migration | Creates initial tables, RLS policies, auth trigger, and storage bucket | Applied to the remote Supabase database on June 12, 2026. |
+| `supabase/migrations/20260629120000_allow_student_status_history_logging.sql` | SQL migration | Allows students to insert controlled status history records for their own draft/submission flow | Needed so student draft creation and submission events can be logged under RLS. |
 | `supabase/seed.sql` | Supabase seed file | Placeholder for future demo seed data | Keeps local `supabase db reset` seed path stable. |
 | `.DS_Store` | macOS metadata | Finder-generated file | Not part of the project. Should usually be ignored by Git. |
 
@@ -363,11 +393,13 @@ Verification completed:
 cd web
 npm run lint
 npm run build
+npm test
 npm run dev
 ```
 
-Lint and production build both pass. The local development server starts at
-`http://localhost:3000`, and `curl -I http://localhost:3000` returns `200 OK`.
+Lint, production build, and `npm test` pass. The local development server
+starts at `http://localhost:3000`, and `curl -I http://localhost:3000` returns
+`200 OK`.
 
 Note: setup used Node.js `v24.16.0`. If `node` and `npm` are not available on
 the shell PATH, use the local runtime path that was downloaded during setup:
@@ -768,6 +800,22 @@ Initial migration fields:
 This table is very useful for explaining administrative accountability during
 the final demo.
 
+Current implementation:
+
+- Draft creation records `null -> draft`.
+- First submission records `draft -> submitted`.
+- Revision edits saved by a student record `revision_requested -> draft`.
+- Revision resubmission records `revision_requested -> submitted`.
+- Admin request-revision records `submitted -> revision_requested`.
+- Admin approval records `submitted -> approved`.
+- Admin rejection records `submitted -> rejected`.
+- Admin publication records an approved publication event with the current
+  `approved` status and a publication note.
+- Students can read history for their own posts.
+- Admins can read all post history.
+- A second migration allows students to insert only the controlled history rows
+  needed for their own draft and submission workflow.
+
 ### `deletion_requests`
 
 Purpose: Allow students to request removal of published posts.
@@ -1010,12 +1058,16 @@ Current progress:
 - Done in code: dashboard has an active `New post` link.
 - Done in code: `/dashboard/posts/new` page exists and is protected.
 - Done in code: students can save a text draft.
-- Done in code: students can submit a text post for review.
+- Done in code: students can submit a post for review.
 - Done in code: submit-for-review requires photo and public-posting consent
   checkboxes.
 - Done in code: dashboard lists the signed-in student's posts and statuses.
-- Pending: edit existing draft page.
-- Pending: image upload and image alt text workflow.
+- Done in code: students can edit their own draft or revision-requested posts
+  from `/dashboard/posts/[postId]/edit`.
+- Done in code: students can upload one JPG, PNG, or WebP featured image to the
+  private `post-images` Supabase Storage bucket.
+- Done in code: submit-for-review requires both a featured image and image alt
+  text.
 
 ### Milestone 4: Admin Review Workflow
 
@@ -1031,7 +1083,46 @@ Definition of done:
 - Admin can publish approved posts.
 - Admin can reject.
 - Admin can archive.
-- Admin actions update status history if implemented.
+- Admin and student workflow actions update status history.
+
+Current progress:
+
+- Done in code: `/admin` is protected by the signed-in user's `profiles.role`.
+- Done in code: signed-out users who visit `/admin` are redirected to
+  `/login?next=/admin`.
+- Done in code: non-admin users who visit `/admin` are redirected back to the
+  student dashboard.
+- Done in code: admin users see an `Admin review` link from the dashboard.
+- Done in code: `/admin` shows review queue counts.
+- Done in code: `/admin` lists review-ready posts with author, status,
+  submitted date, image, alt text, and consent indicators.
+- Done in code: `/admin/posts/[postId]` shows full post content, featured
+  image, alt text, author, consent, submission dates, admin note, and status
+  history.
+- Done in code: admins can request revision, approve, reject, and publish from
+  `/admin/posts/[postId]`.
+- Done in code: admin review actions require confirmation and write
+  `post_status_history` records.
+- Done in code: student draft creation, first submission, revision save, and
+  revision resubmission write controlled `post_status_history` records.
+- Done in code: students can see status history on
+  `/dashboard/posts/[postId]/edit`.
+- Done in code: a follow-up Supabase migration permits student-owned status
+  history inserts while keeping RLS restrictions narrow.
+- Pending manual setup: assign the first real admin role in Supabase
+  `profiles`.
+- Pending database sync: apply
+  `supabase/migrations/20260629120000_allow_student_status_history_logging.sql`
+  to the remote Supabase project.
+- To apply the pending migration, run this from the project root with the real
+  database password supplied only as a local environment variable:
+
+```bash
+SUPABASE_DB_PASSWORD="<database-password>" npx -y supabase@latest db push --linked
+```
+
+- Pending manual test: perform student submission and admin review actions with
+  real accounts.
 
 ### Milestone 5: Public Blog
 
@@ -1042,6 +1133,19 @@ Definition of done:
 - Only approved and published posts appear publicly.
 - Unpublished post URLs are not publicly accessible.
 - Public pages work on mobile and desktop.
+
+Current progress:
+
+- Done in code: `/blog` lists only posts where
+  `review_status = 'approved'` and `is_published = true`.
+- Done in code: `/blog/[slug]` loads only approved and published posts by
+  slug.
+- Done in code: unpublished, unapproved, or missing post URLs return 404.
+- Done in code: public pages use signed URLs for private `post-images` assets
+  when a published post has a featured image.
+- Done in code: the home page links to the public student blog.
+- Pending manual test: publish a real post through the admin workflow and
+  confirm it appears on `/blog` and opens at `/blog/[slug]`.
 
 ### Milestone 6: Documentation And Demo
 
@@ -1058,67 +1162,133 @@ Definition of done:
 - Demo script exists.
 - Sample data is ready.
 
+Current progress:
+
+- Done in code: `web/package.json` includes `npm test`.
+- Done in verification: `npm test` passes.
+- Done in verification: `git diff --check` passes.
+- Done in verification: local route smoke tests confirm public pages return
+  `200`, protected pages redirect signed-out users, and a missing public blog
+  slug returns `404`.
+- Done in docs: README now records the latest automated and route smoke test
+  results.
+- Pending manual test: complete a real student signup/login/submission flow
+  with a confirmed `@angelo.edu` account.
+- Pending manual test: complete a real admin review, approval, publish, and
+  public blog visibility flow.
+- Pending network check: Supabase REST verification currently returns HTTP
+  `000` from this local shell, which means the local environment is not reaching
+  the Supabase host during this test run.
+
 ## Testing Checklist
 
-### Student Tests
+Latest verification run: June 30, 2026.
 
-- Student can register with `@angelo.edu`.
-- Student cannot register with a non-`@angelo.edu` email.
-- Student can log in.
-- Student can log out.
-- Student can accept privacy consent.
-- Student can create a draft.
-- Student can submit a post.
-- Student cannot submit without required fields.
-- Student cannot submit without consent.
-- Student can see their own posts.
-- Student cannot see another student's private posts.
+Automated checks:
 
-### Admin Tests
+| Check | Result | Notes |
+| --- | --- | --- |
+| `npm test` from `web/` | Pass | Runs `npm run lint` and `npm run build`. |
+| `npm run lint` from `web/` | Pass | ESLint completes without reported issues. |
+| `npm run build` from `web/` | Pass | Next.js production build compiles all current routes. |
+| `git diff --check` from project root | Pass | No whitespace errors in the current diff. |
 
-- Admin can log in.
-- Admin can access admin dashboard.
-- Student cannot access admin dashboard.
-- Admin can view submitted posts.
-- Admin can open post review page.
-- Admin can request revision.
-- Admin can approve.
-- Admin can publish an approved post.
-- Admin cannot publish a rejected post.
-- Admin can reject.
-- Admin can archive.
-- Admin note appears to student when revision is requested.
+Local route smoke tests:
 
-### Public Tests
+These were run against the local development server at
+`http://localhost:3000`.
 
-- Public visitor can view homepage.
-- Public visitor can view blog list.
-- Public visitor can view published post.
-- Public visitor cannot view submitted post.
-- Public visitor cannot view rejected post.
-- Public visitor cannot access student dashboard.
-- Public visitor cannot access admin page.
+| Route | Expected | Result |
+| --- | --- | --- |
+| `/` | Homepage loads | `200` |
+| `/signup` | Signup page loads | `200` |
+| `/login` | Login page loads | `200` |
+| `/dashboard` | Signed-out user redirects to login | `307` to `/login?next=/dashboard` |
+| `/admin` | Signed-out user redirects to login | `307` to `/login?next=%2Fadmin` |
+| `/blog` | Public blog list loads | `200` |
+| `/blog/nonexistent-test-slug` | Missing public post returns not found | `404` |
 
-### Security Tests
+Command used:
 
-- Unauthenticated user cannot access dashboard.
-- Student cannot access admin route.
-- Student cannot publish post.
-- Student cannot update another student's post.
-- Public user cannot query private posts.
-- Environment variables are not exposed.
-- Service role key is not used in browser code.
-- RLS policies are active.
+```bash
+for path in / /signup /login /dashboard /admin /blog /blog/nonexistent-test-slug; do
+  code=$(/usr/bin/curl -s -o /dev/null -w "%{http_code}" "http://localhost:3000$path")
+  printf "%s %s\n" "$path" "$code"
+done
+```
 
-### Accessibility Tests
+Supabase connectivity check:
 
-- Forms have labels.
-- Buttons are keyboard accessible.
-- Images have alt text.
-- Error messages are readable.
-- Mobile layout works.
-- Heading order is logical.
-- Status badges are understandable without relying only on color.
+| Check | Result | Notes |
+| --- | --- | --- |
+| Public REST request to `/rest/v1/posts?select=id&limit=1` | Blocked in current shell | Returned HTTP `000`, indicating the local test environment could not reach the Supabase host during this run. |
+
+Manual student tests still required:
+
+- [ ] Student can register with `@angelo.edu`.
+- [ ] Student cannot register with a non-`@angelo.edu` email.
+- [ ] Student can confirm the account through the email inbox.
+- [ ] Student can log in.
+- [ ] Student can log out.
+- [ ] Student can accept privacy consent.
+- [ ] Student can create a draft.
+- [ ] Student can upload a featured image and alt text.
+- [ ] Student can submit a post.
+- [ ] Student cannot submit without required fields.
+- [ ] Student cannot submit without consent.
+- [ ] Student can see their own posts.
+- [ ] Student can see status history for their own post.
+- [ ] Student cannot see another student's private posts.
+
+Manual admin tests still required:
+
+- [ ] Admin can log in.
+- [ ] Admin can access admin dashboard.
+- [ ] Student cannot access admin dashboard.
+- [ ] Admin can view submitted posts.
+- [ ] Admin can open post review page.
+- [ ] Admin can request revision.
+- [ ] Admin can approve.
+- [ ] Admin can publish an approved post.
+- [ ] Admin cannot publish a rejected post.
+- [ ] Admin can reject.
+- [ ] Admin note appears to student when revision is requested.
+- [ ] Admin and student actions create status history records.
+
+Manual public tests still required:
+
+- [x] Public visitor can view homepage.
+- [x] Public visitor can view blog list route.
+- [ ] Public visitor can view a real published post.
+- [ ] Public visitor cannot view a real submitted post by URL.
+- [ ] Public visitor cannot view a real rejected post by URL.
+- [x] Public visitor cannot access student dashboard while signed out.
+- [x] Public visitor cannot access admin page while signed out.
+
+Security checks:
+
+- [x] Unauthenticated user cannot access dashboard.
+- [x] Unauthenticated user cannot access admin route.
+- [x] Service role key is not used in browser code.
+- [ ] Student cannot access admin route after login.
+- [ ] Student cannot publish post.
+- [ ] Student cannot update another student's post.
+- [ ] Public user cannot query private posts.
+- [ ] Environment variables are not exposed in client bundles beyond intended
+  `NEXT_PUBLIC_*` values.
+- [ ] RLS policies are active after the latest status-history migration is
+  applied remotely.
+
+Accessibility checks:
+
+- [x] Main forms use visible labels.
+- [x] Buttons and links use keyboard-accessible native elements.
+- [x] Image upload flow requires alt text before submission.
+- [x] Error messages are visible and readable.
+- [ ] Full mobile layout pass on a real browser.
+- [ ] Full keyboard navigation pass.
+- [ ] Screen reader spot check.
+- [ ] Status badges are understandable without relying only on color.
 
 ## Timeline Context
 
@@ -1170,11 +1340,17 @@ Start here:
 22. [x] Implement student dashboard shell.
 23. [x] Implement create post form.
 24. [x] Implement submit for review.
-25. [ ] Implement admin dashboard.
-26. [ ] Implement approve/publish flow.
-27. [ ] Implement public blog pages.
-28. [ ] Write setup and handoff docs.
-29. [ ] Prepare final demo.
+25. [x] Implement edit existing draft form.
+26. [x] Implement featured image upload and alt text.
+27. [x] Implement admin role/access guard.
+28. [x] Implement admin dashboard.
+29. [x] Implement admin review detail page.
+30. [x] Implement approve/publish flow.
+31. [x] Implement status history logging.
+32. [x] Implement public blog pages.
+33. [x] Run testing and update README.
+34. [ ] Write setup and handoff docs.
+35. [ ] Prepare final demo.
 
 The most important first coding milestone is not the homepage. It is:
 
@@ -1182,9 +1358,10 @@ The most important first coding milestone is not the homepage. It is:
 A student can sign up, log in, create a draft, and submit it for review.
 ```
 
-This is now implemented in code for text-only posts. It still needs manual
-end-to-end testing with a real confirmed `@angelo.edu` account, and image upload
-is still the next feature step.
+This is now implemented in code for posts with one featured image and alt text,
+including editing draft or revision-requested posts before resubmission. It
+still needs manual end-to-end testing with a real confirmed `@angelo.edu`
+account. The next feature step is the admin submitted-post review list.
 
 ## Production Readiness Notes
 

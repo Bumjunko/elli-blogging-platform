@@ -32,6 +32,13 @@ const statusLabels: Record<PostSummary["review_status"], string> = {
   archived: "Archived",
 };
 
+function canEditPost(post: PostSummary) {
+  return (
+    !post.is_published &&
+    ["draft", "revision_requested"].includes(post.review_status)
+  );
+}
+
 type DashboardPageProps = {
   searchParams?: Promise<{
     message?: string;
@@ -61,6 +68,7 @@ export default async function DashboardPage({
       supabase
         .from("posts")
         .select("id, title, review_status, is_published, updated_at")
+        .eq("author_id", user.id)
         .order("updated_at", { ascending: false })
         .returns<PostSummary[]>(),
     ]);
@@ -100,6 +108,15 @@ export default async function DashboardPage({
           <div className="mt-4 inline-flex rounded-md bg-[#e8f1f9] px-3 py-1 text-sm font-semibold capitalize text-[#174a7c]">
             {profile?.role ?? "student"}
           </div>
+
+          {profile?.role === "admin" ? (
+            <Link
+              href="/admin"
+              className="mt-4 flex h-10 items-center justify-center rounded-md bg-[#174a7c] px-4 text-sm font-semibold text-white transition hover:bg-[#10385f]"
+            >
+              Admin review
+            </Link>
+          ) : null}
 
           {!profile ? (
             <p className="mt-5 rounded-md bg-amber-50 px-3 py-2 text-sm leading-6 text-amber-900">
@@ -156,7 +173,7 @@ export default async function DashboardPage({
                         Updated {new Date(post.updated_at).toLocaleDateString()}
                       </p>
                     </div>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <span className="rounded-md bg-slate-100 px-3 py-1 text-sm font-medium text-slate-700">
                         {statusLabels[post.review_status]}
                       </span>
@@ -164,6 +181,14 @@ export default async function DashboardPage({
                         <span className="rounded-md bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-800">
                           Published
                         </span>
+                      ) : null}
+                      {canEditPost(post) ? (
+                        <Link
+                          href={`/dashboard/posts/${post.id}/edit`}
+                          className="flex h-8 items-center rounded-md border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-100"
+                        >
+                          Edit
+                        </Link>
                       ) : null}
                     </div>
                   </li>
@@ -176,8 +201,7 @@ export default async function DashboardPage({
                 No submissions yet
               </h3>
               <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-600">
-                After the post editor is built, student drafts and submitted
-                posts will appear here.
+                Create your first draft to start the submission workflow.
               </p>
             </div>
           )}

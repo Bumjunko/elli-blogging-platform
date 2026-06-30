@@ -75,8 +75,8 @@ export default async function NewPostPage() {
             <ul className="mt-3 space-y-2 text-sm leading-6 text-slate-600">
               <li>Use clear, respectful language.</li>
               <li>Avoid private documents or sensitive personal details.</li>
+              <li>Add one featured image with descriptive alt text.</li>
               <li>Confirm both consent boxes before submitting.</li>
-              <li>Images will be added in the next workflow step.</li>
             </ul>
           </div>
         </aside>
