@@ -74,6 +74,23 @@ Root cleanup has been completed:
   ESLint and a production Next.js build.
 - Testing on June 30, 2026 confirms `npm test`, `git diff --check`, and the
   main local route smoke tests pass.
+- The latest implementation batch has been committed and pushed to GitHub:
+  `23a7284 Implement admin review and public blog workflows`.
+
+Latest completed development batch:
+
+| # | Item | Status |
+| --- | --- | --- |
+| 1 | Draft edit page | Complete |
+| 2 | Image upload + alt text | Complete |
+| 3 | Admin role/access guard | Complete |
+| 4 | Admin dashboard | Complete |
+| 5 | Admin review detail page | Complete |
+| 6 | Approve/reject/request revision/publish actions | Complete |
+| 7 | Status history logging | Complete |
+| 8 | Public blog list/detail pages | Complete |
+| 9 | Testing and README update | Complete |
+| 10 | Commit and push | Complete |
 
 This is now an application codebase foundation, but not yet the ELLI blogging
 MVP. The Supabase database foundation, first authentication slice, dashboard
