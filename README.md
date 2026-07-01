@@ -82,6 +82,10 @@ Root cleanup has been completed:
 - Vercel production route smoke testing on July 1, 2026 confirms the deployed
   homepage, auth pages, protected-route redirects, public blog list, and missing
   blog slug handling work.
+- Live Vercel end-to-end testing on July 1, 2026 confirms a temporary confirmed
+  student account can log in, create and submit a post with an image and alt
+  text, be promoted to admin for review, approve and publish the post, and view
+  it on the public blog.
 - The latest implementation batch has been committed and pushed to GitHub:
   `23a7284 Implement admin review and public blog workflows`.
 
@@ -105,13 +109,13 @@ MVP. The Supabase database foundation, first authentication slice, dashboard
 shell, new-post draft/submission flow, draft edit flow, featured image upload
 with alt text, admin access guard, admin dashboard list, admin review
 detail/actions, status history logging, public blog list/detail pages, and
-basic automated verification now exist. A Vercel Hobby deployment also exists.
-Supabase Auth redirect settings still need to be updated for the deployed URL
-before production signup/login email flows are fully ready.
+basic automated verification now exist. A Vercel Hobby deployment also exists,
+and the deployed student-to-admin-to-public workflow has passed a live E2E test
+using a temporary confirmed test account.
 
-The next development step is to update Supabase Auth redirect settings for the
-Vercel URL, test the deployed end-to-end workflow, then write setup/handoff
-documentation and prepare the final report/demo.
+The next development step is to confirm Supabase Auth redirect settings for the
+Vercel URL, complete remaining negative-path/security/accessibility checks, then
+write setup/handoff documentation and prepare the final report/demo.
 
 Live deployment:
 
@@ -1206,6 +1210,10 @@ Current progress:
   `https://elli-blogging-platform.vercel.app`.
 - Done in verification: Vercel production route smoke tests match the expected
   local route behavior.
+- Done in verification: live Vercel E2E testing confirms login, student post
+  submission, featured image upload with alt text, admin approval, admin
+  publication, public blog list/detail visibility, status-history records, and
+  cleanup of temporary test data.
 - Done in docs: README now records the latest automated and route smoke test
   results.
 - Done in verification: Supabase project woke from `INACTIVE`/`COMING_UP` to
@@ -1213,11 +1221,9 @@ Current progress:
   migrations are up to date.
 - Done in manual testing: a real user flow was tested from student post
   creation/submission through admin publish and public blog visibility.
-- Pending deployment configuration: update Supabase Auth Site URL and Redirect
-  URLs for the Vercel deployment.
-- Pending deployed manual test: repeat the student signup/submission/admin
-  publish/public blog workflow on the Vercel URL after Supabase Auth redirects
-  are updated.
+- Pending deployment configuration: confirm Supabase Auth Site URL and Redirect
+  URLs for the Vercel deployment so normal email-confirmation links return to
+  the deployed app.
 - Pending manual test: complete negative-path checks such as non-`@angelo.edu`
   signup rejection, rejected-post visibility, request-revision behavior, and
   student/admin permission boundaries.
@@ -1237,6 +1243,7 @@ Automated checks:
 | `supabase db push --linked --dry-run` | Pass | Remote database is up to date after applying the latest migration. |
 | Supabase migration list | Pass | Remote includes `20260612143000` and `20260629120000`. |
 | Vercel production deployment | Pass | Deployed at `https://elli-blogging-platform.vercel.app`. |
+| Live Vercel E2E test | Pass | Temporary confirmed test user created a post with image/alt text, admin approved and published it, public blog list/detail showed it, and all temporary DB/storage data was cleaned up. |
 
 Local route smoke tests:
 
@@ -1276,6 +1283,28 @@ These were run against `https://elli-blogging-platform.vercel.app`.
 | `/blog` | Public blog list loads | `200` |
 | `/blog/nonexistent-test-slug` | Missing public post returns not found | `404` |
 
+Live Vercel E2E coverage:
+
+This test was run against `https://elli-blogging-platform.vercel.app` on
+July 1, 2026. It used a temporary confirmed `@angelo.edu` test account created
+through Supabase Admin tooling so the deployed app workflow could be verified
+without waiting for a real inbox confirmation email.
+
+| Step | Result |
+| --- | --- |
+| Create temporary confirmed auth user and profile | Pass |
+| Log in on deployed `/login` and reach `/dashboard` | Pass |
+| Create a new student post with featured image and alt text | Pass |
+| Submit the post for review | Pass |
+| Verify submitted post in the remote database | Pass |
+| Promote temporary profile to admin for review testing | Pass |
+| Open deployed admin dashboard and review detail page | Pass |
+| Approve the submitted post | Pass |
+| Publish the approved post | Pass |
+| Verify remote status history records | Pass |
+| Verify public `/blog` list and `/blog/[slug]` detail visibility | Pass |
+| Delete temporary auth user, post rows, status history, and storage image | Pass |
+
 Supabase connectivity check:
 
 | Check | Result | Notes |
@@ -1312,7 +1341,7 @@ Manual admin tests still required:
 - [ ] Admin cannot publish a rejected post.
 - [ ] Admin can reject.
 - [ ] Admin note appears to student when revision is requested.
-- [ ] Admin and student actions create status history records.
+- [x] Admin and student actions create status history records.
 
 Manual public tests still required:
 
