@@ -86,6 +86,16 @@ Root cleanup has been completed:
   student account can log in, create and submit a post with an image and alt
   text, be promoted to admin for review, approve and publish the post, and view
   it on the public blog.
+- A UI polish branch named `ui` is in progress. It adds an ASU-inspired visual
+  system, uses the ASU logo asset in the shared header, replaces the simpler
+  per-page navigation with a consistent slide-out menu, and updates visible
+  review language from CIS staff review to ELLI instructor review.
+- The shared menu now adapts to the signed-in user's session and role:
+  signed-out visitors see public pages plus `Sign In` and `Sign Up`; signed-in
+  students see `Dashboard`; signed-in admin users also see `Admin Review`.
+- The active menu item is highlighted in ASU gold on every page, including
+  nested routes such as `/blog/[slug]`, `/dashboard/posts/[postId]/edit`, and
+  `/admin/posts/[postId]`.
 - The latest implementation batch has been committed and pushed to GitHub:
   `23a7284 Implement admin review and public blog workflows`.
 
@@ -104,14 +114,27 @@ Latest completed development batch:
 | 9 | Testing and README update | Complete |
 | 10 | Commit and push | Complete |
 
+Latest UI polish batch on the `ui` branch:
+
+| # | Item | Status |
+| --- | --- | --- |
+| 1 | ASU-inspired header and color system | Complete locally |
+| 2 | ASU logo asset in the shared header | Complete locally |
+| 3 | Consistent slide-out menu on all major pages | Complete locally |
+| 4 | Active page highlight in gold | Complete locally |
+| 5 | Role-aware menu visibility for Dashboard and Admin Review | Complete locally |
+| 6 | ELLI instructor review language across UI copy | Complete locally |
+| 7 | Local lint/build verification | Complete locally |
+
 This is now an application codebase foundation, but not yet the ELLI blogging
 MVP. The Supabase database foundation, first authentication slice, dashboard
 shell, new-post draft/submission flow, draft edit flow, featured image upload
 with alt text, admin access guard, admin dashboard list, admin review
 detail/actions, status history logging, public blog list/detail pages, and
-basic automated verification now exist. A Vercel Hobby deployment also exists,
-and the deployed student-to-admin-to-public workflow has passed a live E2E test
-using a temporary confirmed test account.
+basic automated verification now exist. The `ui` branch also includes a branded
+ASU-style interface pass and role-aware menu visibility. A Vercel Hobby
+deployment also exists, and the deployed student-to-admin-to-public workflow has
+passed a live E2E test using a temporary confirmed test account.
 
 The next development step is to confirm Supabase Auth redirect settings for the
 Vercel URL, complete remaining negative-path/security/accessibility checks, then
@@ -136,8 +159,10 @@ https://elli-blogging-platform.vercel.app
 | `docs/proposal/Proposal & Project Design.pdf` | PDF | Proposal/project design export | 8-page PDF export. Likely another shareable version. |
 | `web/package.json` | npm package manifest | Next.js app dependency and script definition | Includes `dev`, `build`, `start`, `lint`, and `test`; `test` runs lint plus production build. |
 | `web/src/app/` | Next.js App Router source | Home, public blog list/detail, signup, login, auth callback, dashboard, protected admin shell, new/edit post flow, admin review flow, layout, global styles, and favicon | Auth, post submission, draft edit, featured-image upload, admin guard, admin review actions, status history UI, and public blog pages are implemented. |
+| `web/src/components/layout/` | Shared layout components | ASU-branded header, logo, and role-aware slide-out navigation menu | Used across public, auth, student dashboard, and admin pages on the `ui` branch. |
 | `web/src/lib/posts/` | Post workflow helpers | Shared post status history helper | Used by student and admin server actions to keep workflow logging consistent. |
 | `web/src/lib/supabase/` | Supabase client helpers | Browser and server client factories | Uses publishable key and cookie-aware SSR client setup. |
+| `web/public/ASU_simple_logo.png` | Public image asset | ASU logo used by the branded header | Must remain in `web/public/` so Next.js can serve it at `/ASU_simple_logo.png`. |
 | `web/.env.example` | Web environment template | Documents variables needed by the Next.js app | Safe to commit; real local values stay in ignored `web/.env.local`. |
 | `web/package-lock.json` | npm lockfile | Reproducible dependency install record | Should be committed. |
 | `supabase/.gitignore` | Supabase local ignore rules | Prevents local Supabase temp files and env files from being committed | Created by `supabase init`. |
@@ -191,8 +216,9 @@ publishing system:
 3. The student creates a blog post.
 4. The student uploads one featured image.
 5. The student accepts photo-use and public-posting consent for that submission.
-6. CIS Staff reviews the submission.
-7. CIS Staff approves, rejects, requests revision, archives, or publishes.
+6. An ELLI instructor reviews the submission.
+7. An ELLI instructor approves, rejects, requests revision, archives, or
+   publishes.
 8. Public visitors can view only posts that are approved and published.
 
 The MVP should prove that this complete workflow works securely and clearly.
@@ -204,7 +230,7 @@ The MVP should prove that this complete workflow works securely and clearly.
 | Project Owner | Center for International Studies (CIS) | Long-term ownership, policy, content review, administrative use. |
 | Initial Developer | Bumjun Ko | Build MVP, document setup, prepare handoff. |
 | Academic Advisor | Dr. Erdogan Dogdu | Academic review and Senior Design guidance. |
-| Administrative Users | CIS Staff | Review, approve, reject, publish, archive, and manage submissions. |
+| Administrative Users | ELLI Instructors | Review, approve, reject, publish, archive, and manage submissions. |
 | Student Users | ELLI participants with valid `@angelo.edu` email addresses | Register, write, submit, track status, and request deletion. |
 | Public Users | Visitors to the public blog | View approved and published posts only. |
 | Future Review Partner | ASU IT/Web Services | Review production hosting, security, accessibility, domain, and integration. |
@@ -1201,8 +1227,17 @@ Definition of done:
 Current progress:
 
 - Done in code: `web/package.json` includes `npm test`.
+- Done in code: the `ui` branch has a shared ASU-branded header and
+  role-aware slide-out navigation menu.
+- Done in code: menu visibility now depends on Supabase auth/profile state:
+  guests see public/auth links, signed-in students see Dashboard, and admin
+  users see Admin Review.
+- Done in code: current-page menu highlighting uses ASU gold across top-level
+  and nested routes.
 - Done in verification: `npm test` passes.
 - Done in verification: `git diff --check` passes.
+- Done in verification: local browser checks confirm the signed-out menu shows
+  only `Home`, `ELLI Student Blog`, `Sign In`, and `Sign Up`.
 - Done in verification: local route smoke tests confirm public pages return
   `200`, protected pages redirect signed-out users, and a missing public blog
   slug returns `404`.
@@ -1240,6 +1275,7 @@ Automated checks:
 | `npm run lint` from `web/` | Pass | ESLint completes without reported issues. |
 | `npm run build` from `web/` | Pass | Next.js production build compiles all current routes. |
 | `git diff --check` from project root | Pass | No whitespace errors in the current diff. |
+| Local signed-out menu check | Pass | Menu shows `Home`, `ELLI Student Blog`, `Sign In`, and `Sign Up`; protected student/admin links are hidden. |
 | `supabase db push --linked --dry-run` | Pass | Remote database is up to date after applying the latest migration. |
 | Supabase migration list | Pass | Remote includes `20260612143000` and `20260629120000`. |
 | Vercel production deployment | Pass | Deployed at `https://elli-blogging-platform.vercel.app`. |
