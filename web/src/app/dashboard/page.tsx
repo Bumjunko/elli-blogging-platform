@@ -98,7 +98,7 @@ export default async function DashboardPage({
           {profile?.role === "admin" ? (
             <Link
               href="/admin"
-              className="brand-primary-button mt-4 flex"
+              className="brand-primary-button mt-5 flex w-full"
             >
               Admin review
             </Link>
