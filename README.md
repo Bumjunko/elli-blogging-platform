@@ -5,7 +5,7 @@ Blogging Platform, a moderated student blogging system for the English Language
 Learners' Institute (ELLI) under the Center for International Studies (CIS) at
 Angelo State University.
 
-Last reviewed: June 30, 2026
+Last reviewed: July 1, 2026
 
 ## Current Status
 
@@ -77,6 +77,11 @@ Root cleanup has been completed:
 - Manual end-to-end testing on June 30, 2026 confirms a student post can be
   created, submitted, reviewed as an admin, published, and viewed on the public
   blog.
+- The app has been deployed to Vercel Hobby at
+  `https://elli-blogging-platform.vercel.app`.
+- Vercel production route smoke testing on July 1, 2026 confirms the deployed
+  homepage, auth pages, protected-route redirects, public blog list, and missing
+  blog slug handling work.
 - The latest implementation batch has been committed and pushed to GitHub:
   `23a7284 Implement admin review and public blog workflows`.
 
@@ -100,11 +105,19 @@ MVP. The Supabase database foundation, first authentication slice, dashboard
 shell, new-post draft/submission flow, draft edit flow, featured image upload
 with alt text, admin access guard, admin dashboard list, admin review
 detail/actions, status history logging, public blog list/detail pages, and
-basic automated verification now exist. Deployment configuration is not
-implemented yet.
+basic automated verification now exist. A Vercel Hobby deployment also exists.
+Supabase Auth redirect settings still need to be updated for the deployed URL
+before production signup/login email flows are fully ready.
 
-The next development step is to test the full workflow with real student and
-admin accounts, then write setup/handoff documentation and prepare deployment.
+The next development step is to update Supabase Auth redirect settings for the
+Vercel URL, test the deployed end-to-end workflow, then write setup/handoff
+documentation and prepare the final report/demo.
+
+Live deployment:
+
+```text
+https://elli-blogging-platform.vercel.app
+```
 
 ## Current Root Layout
 
@@ -1189,6 +1202,10 @@ Current progress:
 - Done in verification: local route smoke tests confirm public pages return
   `200`, protected pages redirect signed-out users, and a missing public blog
   slug returns `404`.
+- Done in deployment: Vercel Hobby production deployment is available at
+  `https://elli-blogging-platform.vercel.app`.
+- Done in verification: Vercel production route smoke tests match the expected
+  local route behavior.
 - Done in docs: README now records the latest automated and route smoke test
   results.
 - Done in verification: Supabase project woke from `INACTIVE`/`COMING_UP` to
@@ -1196,13 +1213,18 @@ Current progress:
   migrations are up to date.
 - Done in manual testing: a real user flow was tested from student post
   creation/submission through admin publish and public blog visibility.
+- Pending deployment configuration: update Supabase Auth Site URL and Redirect
+  URLs for the Vercel deployment.
+- Pending deployed manual test: repeat the student signup/submission/admin
+  publish/public blog workflow on the Vercel URL after Supabase Auth redirects
+  are updated.
 - Pending manual test: complete negative-path checks such as non-`@angelo.edu`
   signup rejection, rejected-post visibility, request-revision behavior, and
   student/admin permission boundaries.
 
 ## Testing Checklist
 
-Latest verification run: June 30, 2026.
+Latest verification run: July 1, 2026.
 
 Automated checks:
 
@@ -1214,6 +1236,7 @@ Automated checks:
 | `git diff --check` from project root | Pass | No whitespace errors in the current diff. |
 | `supabase db push --linked --dry-run` | Pass | Remote database is up to date after applying the latest migration. |
 | Supabase migration list | Pass | Remote includes `20260612143000` and `20260629120000`. |
+| Vercel production deployment | Pass | Deployed at `https://elli-blogging-platform.vercel.app`. |
 
 Local route smoke tests:
 
@@ -1238,6 +1261,20 @@ for path in / /signup /login /dashboard /admin /blog /blog/nonexistent-test-slug
   printf "%s %s\n" "$path" "$code"
 done
 ```
+
+Vercel production route smoke tests:
+
+These were run against `https://elli-blogging-platform.vercel.app`.
+
+| Route | Expected | Result |
+| --- | --- | --- |
+| `/` | Homepage loads | `200` |
+| `/signup` | Signup page loads | `200` |
+| `/login` | Login page loads | `200` |
+| `/dashboard` | Signed-out user redirects to login | `307` |
+| `/admin` | Signed-out user redirects to login | `307` |
+| `/blog` | Public blog list loads | `200` |
+| `/blog/nonexistent-test-slug` | Missing public post returns not found | `404` |
 
 Supabase connectivity check:
 
