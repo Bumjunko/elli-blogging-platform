@@ -24,7 +24,7 @@ export function SignupForm() {
           type="text"
           autoComplete="name"
           required
-          className="h-11 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-950 outline-none transition focus:border-[#174a7c] focus:ring-2 focus:ring-[#174a7c]/20"
+          className="h-11 w-full rounded border border-slate-300 bg-white px-3 text-sm text-slate-950 outline-none transition focus:border-[#003b7a] focus:ring-2 focus:ring-[#003b7a]/20"
         />
       </div>
 
@@ -39,7 +39,7 @@ export function SignupForm() {
           autoComplete="email"
           placeholder="name@angelo.edu"
           required
-          className="h-11 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-950 outline-none transition focus:border-[#174a7c] focus:ring-2 focus:ring-[#174a7c]/20"
+          className="h-11 w-full rounded border border-slate-300 bg-white px-3 text-sm text-slate-950 outline-none transition focus:border-[#003b7a] focus:ring-2 focus:ring-[#003b7a]/20"
         />
       </div>
 
@@ -54,7 +54,7 @@ export function SignupForm() {
           autoComplete="new-password"
           minLength={8}
           required
-          className="h-11 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-950 outline-none transition focus:border-[#174a7c] focus:ring-2 focus:ring-[#174a7c]/20"
+          className="h-11 w-full rounded border border-slate-300 bg-white px-3 text-sm text-slate-950 outline-none transition focus:border-[#003b7a] focus:ring-2 focus:ring-[#003b7a]/20"
         />
       </div>
 
@@ -63,7 +63,7 @@ export function SignupForm() {
           name="privacyConsent"
           type="checkbox"
           required
-          className="mt-1 h-4 w-4 rounded border-slate-300 accent-[#174a7c]"
+          className="mt-1 h-4 w-4 rounded border-slate-300 accent-[#003b7a]"
         />
         <span>
           I understand this platform is for moderated ELLI blog submissions and

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
+import { BrandHeader } from "@/components/layout/brand-header";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 type BlogPostPageProps = {
@@ -92,7 +92,7 @@ export async function generateMetadata({
     title: `${post.title} | ELLI Student Blog`,
     description:
       post.excerpt ??
-      "A published ELLI student blog post reviewed by CIS staff.",
+      "A published ELLI student blog post reviewed by ELLI instructors.",
   };
 }
 
@@ -109,42 +109,23 @@ export default async function PublicBlogPostPage({
   const paragraphs = renderParagraphs(post.content);
 
   return (
-    <main className="min-h-screen bg-[#f5f7fa] text-slate-950">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex w-full max-w-4xl flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <Link href="/blog" className="text-sm font-semibold text-[#174a7c]">
-              Back to student blog
-            </Link>
-            <p className="mt-2 text-sm font-semibold text-slate-500">
-              Published {formatDate(post.published_at)}
-            </p>
-          </div>
-          <nav className="flex flex-wrap gap-3">
-            <Link
-              href="/"
-              className="flex h-10 items-center rounded-md border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-100"
-            >
-              Home
-            </Link>
-            <Link
-              href="/login"
-              className="flex h-10 items-center rounded-md bg-[#174a7c] px-4 text-sm font-semibold text-white transition hover:bg-[#10385f]"
-            >
-              Sign in
-            </Link>
-          </nav>
-        </div>
-      </header>
+    <main className="min-h-screen brand-page text-slate-950">
+      <BrandHeader
+        title={post.title}
+        eyebrow={`Published ${formatDate(post.published_at)}`}
+        backHref="/blog"
+        backLabel="Back to student blog"
+        maxWidth="max-w-4xl"
+      />
 
       <article className="mx-auto w-full max-w-4xl px-6 py-8">
-        <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm sm:p-8">
-          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#8a5a10]">
+        <div className="brand-surface p-5 sm:p-8">
+          <p className="brand-eyebrow">
             ELLI Student Blog
           </p>
-          <h1 className="mt-3 text-4xl font-semibold tracking-normal text-slate-950 sm:text-5xl">
+          <h2 className="mt-3 text-4xl font-semibold text-[#002856] sm:text-5xl">
             {post.title}
-          </h1>
+          </h2>
           {post.excerpt ? (
             <p className="mt-4 text-lg leading-8 text-slate-600">
               {post.excerpt}

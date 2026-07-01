@@ -53,7 +53,7 @@ export function PostEditorForm({
           maxLength={140}
           required
           defaultValue={state.values.title}
-          className="h-11 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-950 outline-none transition focus:border-[#174a7c] focus:ring-2 focus:ring-[#174a7c]/20"
+          className="h-11 w-full rounded border border-slate-300 bg-white px-3 text-sm text-slate-950 outline-none transition focus:border-[#003b7a] focus:ring-2 focus:ring-[#003b7a]/20"
         />
       </div>
 
@@ -73,7 +73,7 @@ export function PostEditorForm({
           rows={3}
           maxLength={220}
           defaultValue={state.values.excerpt}
-          className="w-full resize-y rounded-md border border-slate-300 bg-white px-3 py-2 text-sm leading-6 text-slate-950 outline-none transition focus:border-[#174a7c] focus:ring-2 focus:ring-[#174a7c]/20"
+          className="w-full resize-y rounded border border-slate-300 bg-white px-3 py-2 text-sm leading-6 text-slate-950 outline-none transition focus:border-[#003b7a] focus:ring-2 focus:ring-[#003b7a]/20"
         />
       </div>
 
@@ -88,7 +88,7 @@ export function PostEditorForm({
           minLength={20}
           required
           defaultValue={state.values.content}
-          className="w-full resize-y rounded-md border border-slate-300 bg-white px-3 py-2 text-sm leading-6 text-slate-950 outline-none transition focus:border-[#174a7c] focus:ring-2 focus:ring-[#174a7c]/20"
+          className="w-full resize-y rounded border border-slate-300 bg-white px-3 py-2 text-sm leading-6 text-slate-950 outline-none transition focus:border-[#003b7a] focus:ring-2 focus:ring-[#003b7a]/20"
         />
       </div>
 
@@ -110,7 +110,7 @@ export function PostEditorForm({
             name="featuredImage"
             type="file"
             accept="image/jpeg,image/png,image/webp"
-            className="block w-full rounded-md border border-slate-300 bg-white text-sm text-slate-700 file:mr-4 file:h-10 file:border-0 file:bg-[#174a7c] file:px-4 file:text-sm file:font-semibold file:text-white hover:file:bg-[#10385f]"
+            className="block w-full rounded border border-slate-300 bg-white text-sm text-slate-700 file:mr-4 file:h-10 file:border-0 file:bg-[#003b7a] file:px-4 file:text-sm file:font-semibold file:text-white hover:file:bg-[#002856]"
           />
           {state.values.featuredImagePath ? (
             <p className="text-xs leading-5 text-slate-600">
@@ -142,7 +142,7 @@ export function PostEditorForm({
             maxLength={180}
             defaultValue={state.values.featuredImageAlt}
             placeholder="Describe the image for readers using assistive technology"
-            className="h-11 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-[#174a7c] focus:ring-2 focus:ring-[#174a7c]/20"
+            className="h-11 w-full rounded border border-slate-300 bg-white px-3 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-[#003b7a] focus:ring-2 focus:ring-[#003b7a]/20"
           />
         </div>
       </div>
@@ -153,7 +153,7 @@ export function PostEditorForm({
             name="photoConsent"
             type="checkbox"
             defaultChecked={state.values.photoConsent}
-            className="mt-1 h-4 w-4 rounded border-slate-300 accent-[#174a7c]"
+            className="mt-1 h-4 w-4 rounded border-slate-300 accent-[#003b7a]"
           />
           <span>
             I confirm that I have permission to include any people or media
@@ -166,11 +166,11 @@ export function PostEditorForm({
             name="publicPostingConsent"
             type="checkbox"
             defaultChecked={state.values.publicPostingConsent}
-            className="mt-1 h-4 w-4 rounded border-slate-300 accent-[#174a7c]"
+            className="mt-1 h-4 w-4 rounded border-slate-300 accent-[#003b7a]"
           />
           <span>
-            I understand this post may become public after CIS staff review and
-            approval.
+            I understand this post may become public after ELLI instructor
+            review and approval.
           </span>
         </label>
       </div>

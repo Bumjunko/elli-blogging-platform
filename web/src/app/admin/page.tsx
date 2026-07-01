@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { signOutAction } from "@/app/auth/actions";
+import { BrandHeader } from "@/components/layout/brand-header";
 import { requireAdminProfile } from "@/lib/auth/roles";
 
 type ReviewStatusCount = {
@@ -44,7 +44,7 @@ const statusLabels: Record<ReviewStatus, string> = {
 };
 
 const statusClasses: Record<ReviewStatus, string> = {
-  submitted: "bg-[#e8f1f9] text-[#174a7c]",
+  submitted: "bg-[#eef5fb] text-[#003b7a]",
   revision_requested: "bg-amber-50 text-amber-900",
   approved: "bg-emerald-50 text-emerald-800",
   rejected: "bg-red-50 text-red-800",
@@ -125,38 +125,25 @@ export default async function AdminPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-[#f5f7fa] text-slate-950">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <Link href="/dashboard" className="text-sm font-semibold text-[#174a7c]">
-              Back to dashboard
-            </Link>
-            <h1 className="mt-2 text-2xl font-semibold tracking-normal">
-              Admin Review
-            </h1>
-          </div>
-          <form action={signOutAction}>
-            <button
-              type="submit"
-              className="h-10 rounded-md border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-100"
-            >
-              Sign out
-            </button>
-          </form>
-        </div>
-      </header>
+    <main className="min-h-screen brand-page text-slate-950">
+      <BrandHeader
+        title="Admin Review"
+        eyebrow="ELLI instructor workflow"
+        subtitle="Review student submissions, track status, and publish approved ELLI blog posts."
+        backHref="/dashboard"
+        backLabel="Back to dashboard"
+      />
 
       <div className="mx-auto grid w-full max-w-6xl gap-6 px-6 py-8 lg:grid-cols-[280px_1fr]">
-        <aside className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+        <aside className="brand-surface p-5">
           <p className="text-sm font-semibold text-slate-500">Signed in as</p>
-          <h2 className="mt-2 text-lg font-semibold text-slate-950">
+          <h2 className="mt-2 text-lg font-semibold text-[#002856]">
             {profile.full_name || profile.email}
           </h2>
           <p className="mt-1 break-words text-sm text-slate-600">
             {profile.email}
           </p>
-          <div className="mt-4 inline-flex rounded-md bg-[#e8f1f9] px-3 py-1 text-sm font-semibold capitalize text-[#174a7c]">
+          <div className="mt-4 inline-flex rounded bg-[#ffc627] px-3 py-1 text-sm font-semibold capitalize text-[#002856]">
             {profile.role}
           </div>
         </aside>
@@ -166,21 +153,21 @@ export default async function AdminPage() {
             {reviewCounts.map((item) => (
               <div
                 key={item.label}
-                className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm"
+                className="brand-surface p-4"
               >
                 <p className="text-sm font-semibold text-slate-500">
                   {item.label}
                 </p>
-                <p className="mt-2 text-3xl font-semibold text-slate-950">
+                <p className="mt-2 text-3xl font-semibold text-[#002856]">
                   {item.value}
                 </p>
               </div>
             ))}
           </div>
 
-          <div className="rounded-lg border border-slate-200 bg-white shadow-sm">
+          <div className="brand-surface overflow-hidden">
             <div className="border-b border-slate-200 p-5">
-              <h2 className="text-xl font-semibold text-slate-950">
+              <h2 className="text-xl font-semibold text-[#002856]">
                 Submitted posts
               </h2>
               <p className="mt-1 text-sm leading-6 text-slate-600">
@@ -206,7 +193,7 @@ export default async function AdminPage() {
                     >
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
-                          <h3 className="font-semibold text-slate-950">
+                          <h3 className="font-semibold text-[#002856]">
                             {post.title}
                           </h3>
                           <span
@@ -250,7 +237,7 @@ export default async function AdminPage() {
                       <div className="flex flex-col gap-2 text-sm text-slate-700 xl:items-end">
                         <Link
                           href={`/admin/posts/${post.id}`}
-                          className="flex h-9 items-center justify-center rounded-md bg-[#174a7c] px-3 text-sm font-semibold text-white transition hover:bg-[#10385f]"
+                          className="brand-primary-button h-9"
                         >
                           Open review
                         </Link>
@@ -278,12 +265,12 @@ export default async function AdminPage() {
               </ul>
             ) : (
               <div className="p-8 text-center">
-                <h3 className="text-lg font-semibold text-slate-950">
+                <h3 className="text-lg font-semibold text-[#002856]">
                   No review-ready posts yet
                 </h3>
                 <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-600">
                   Student submissions will appear here after they are sent for
-                  CIS staff review.
+                  ELLI instructor review.
                 </p>
               </div>
             )}

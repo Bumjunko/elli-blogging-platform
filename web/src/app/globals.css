@@ -1,8 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f6f8fb;
+  --foreground: #08203f;
+  --asu-navy: #002856;
+  --asu-blue: #003b7a;
+  --asu-gold: #ffc627;
+  --asu-gold-dark: #d59600;
+  --asu-ice: #eef5fb;
+  --asu-border: #d9e4ee;
 }
 
 @theme inline {
@@ -12,15 +18,418 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+::selection {
+  background: var(--asu-gold);
+  color: var(--asu-navy);
+}
+
+.brand-header {
+  background:
+    linear-gradient(180deg, rgba(0, 40, 86, 0.98), rgba(0, 40, 86, 1)),
+    var(--asu-navy);
+  color: white;
+}
+
+.brand-header-inner {
+  align-items: center;
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  min-height: 12.5rem;
+  padding: 1.5rem 1.5rem 1.75rem;
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .brand-header-inner {
+    gap: 2rem;
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .brand-header-inner {
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
+}
+
+.brand-header-copy {
+  justify-self: center;
+  min-width: 0;
+  text-align: center;
+}
+
+.brand-header-copy > div {
+  justify-content: center;
+}
+
+.brand-header-copy h1,
+.brand-header-copy p {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.brand-header-copy p {
+  max-width: min(72rem, calc(100vw - 4rem));
+  text-align: center;
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .brand-header-copy p {
+    white-space: normal;
+  }
+}
+
+@media (max-width: 900px) {
+  .brand-header-inner {
+    grid-template-columns: minmax(0, 1fr) auto;
+    min-height: 0;
+  }
+
+  .brand-header-copy {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .brand-menu {
+    grid-column: 2;
+    grid-row: 1;
+  }
+}
+
+.brand-header-back {
+  color: white;
+  text-decoration: none;
+}
+
+.brand-header-back:hover {
+  color: var(--asu-gold);
+}
+
+.brand-logo-link {
+  align-items: center;
+  color: white;
+  display: inline-flex;
+  gap: 0.85rem;
+  min-width: 0;
+  text-decoration: none;
+}
+
+.brand-logo-mark {
+  align-items: center;
+  background: white;
+  border: 1px solid rgba(255, 255, 255, 0.38);
+  border-radius: 8px;
+  display: inline-flex;
+  height: 64px;
+  justify-content: center;
+  overflow: hidden;
+  padding: 0.15rem;
+  width: 64px;
+}
+
+.brand-logo-text {
+  display: grid;
+  gap: 0.1rem;
+  line-height: 1.1;
+}
+
+.brand-logo-text span:first-child {
+  color: var(--asu-gold);
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.brand-logo-text span:last-child {
+  color: white;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.brand-menu {
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: end;
+  position: relative;
+  z-index: 50;
+}
+
+.brand-menu[open]::before {
+  background: rgba(0, 24, 52, 0.68);
+  content: "";
+  inset: 0;
+  position: fixed;
+  z-index: 40;
+}
+
+.brand-menu summary {
+  list-style: none;
+}
+
+.brand-menu summary::-webkit-details-marker {
+  display: none;
+}
+
+.brand-menu-button {
+  align-items: center;
+  background: var(--asu-gold);
+  border: 2px solid rgba(255, 255, 255, 0.82);
+  color: var(--asu-navy);
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 0.92rem;
+  font-weight: 900;
+  gap: 1.1rem;
+  height: 3.25rem;
+  justify-content: center;
+  letter-spacing: 0;
+  padding: 0 1.15rem;
+  position: relative;
+  text-transform: uppercase;
+  user-select: none;
+  z-index: 70;
+}
+
+.brand-menu-button:hover {
+  background: #ffdc66;
+}
+
+.brand-menu-icon {
+  display: grid;
+  gap: 0.24rem;
+  width: 1.1rem;
+}
+
+.brand-menu-icon span {
+  background: var(--asu-navy);
+  display: block;
+  height: 2px;
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
+  width: 100%;
+}
+
+.brand-menu[open] .brand-menu-icon span:first-child {
+  transform: translateY(6px) rotate(45deg);
+}
+
+.brand-menu[open] .brand-menu-icon span:nth-child(2) {
+  opacity: 0;
+}
+
+.brand-menu[open] .brand-menu-icon span:last-child {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+.brand-menu-panel {
+  background: var(--asu-blue);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  box-shadow: -28px 0 70px rgba(0, 22, 48, 0.34);
+  display: grid;
+  align-content: start;
+  gap: 1rem;
+  min-height: 100vh;
+  padding: 5.4rem 3rem 3rem;
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: min(42rem, 48vw);
+  z-index: 60;
+}
+
+.brand-menu-panel::before {
+  border-top: 2px solid rgba(255, 255, 255, 0.72);
+  content: "Navigation";
+  color: white;
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  padding-top: 0.9rem;
+  text-transform: uppercase;
+}
+
+.brand-menu-panel nav {
+  display: grid;
+  gap: 0;
+}
+
+.brand-menu-item {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.06);
+  border: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 0;
+  color: white;
+  display: flex;
+  font-size: 1.05rem;
+  font-weight: 800;
+  height: 3.7rem;
+  padding-left: 1.35rem;
+  padding-right: 1rem;
+  position: relative;
+  text-decoration: none;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease;
+  width: 100%;
+}
+
+.brand-menu-item:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: white;
+}
+
+.brand-menu-item.is-active {
+  background: var(--asu-gold);
+  color: var(--asu-navy);
+}
+
+.brand-menu-item::before {
+  background: var(--asu-gold);
+  bottom: 0;
+  content: "";
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 0.55rem;
+}
+
+.brand-menu-item.is-active::before {
+  background: var(--asu-navy);
+}
+
+@media (max-width: 900px) {
+  .brand-menu-panel {
+    padding: 5rem 1.5rem 2rem;
+    width: min(26rem, calc(100vw - 1.5rem));
+  }
+
+  .brand-menu-item {
+    font-size: 1rem;
+    height: 4rem;
+    padding-left: 1.25rem;
+    padding-right: 1rem;
+  }
+
+  .brand-menu-item::before {
+    width: 0.5rem;
+  }
+}
+
+.brand-page {
+  background:
+    linear-gradient(180deg, #f8fafc 0%, #f3f6fa 46%, #eef3f8 100%);
+  color: var(--foreground);
+}
+
+.brand-surface {
+  background: white;
+  border: 1px solid var(--asu-border);
+  border-radius: 8px;
+  box-shadow: 0 14px 34px rgba(0, 40, 86, 0.08);
+}
+
+.brand-panel {
+  background: var(--asu-ice);
+  border: 1px solid #c9d9e8;
+  border-radius: 8px;
+}
+
+.brand-rule {
+  border-top: 2px solid rgba(0, 40, 86, 0.52);
+}
+
+.brand-eyebrow {
+  color: var(--asu-gold-dark);
+  font-size: 0.875rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.brand-link-button,
+.brand-primary-button,
+.brand-gold-button,
+.brand-outline-button {
+  align-items: center;
+  border-radius: 4px;
+  display: inline-flex;
+  font-size: 0.875rem;
+  font-weight: 800;
+  height: 2.5rem;
+  justify-content: center;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  text-decoration: none;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.brand-primary-button {
+  background: var(--asu-blue);
+  color: white;
+}
+
+.brand-primary-button:hover {
+  background: var(--asu-navy);
+}
+
+.brand-gold-button {
+  background: var(--asu-gold);
+  color: var(--asu-navy);
+}
+
+.brand-gold-button:hover {
+  background: #ffda63;
+}
+
+.brand-outline-button {
+  background: white;
+  border: 1px solid #b9c7d6;
+  color: var(--asu-navy);
+}
+
+.brand-outline-button:hover {
+  background: var(--asu-ice);
+  border-color: var(--asu-blue);
+}
+
+.brand-header .brand-outline-button {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.32);
+  color: white;
+}
+
+.brand-header .brand-outline-button:hover {
+  background: white;
+  border-color: white;
+  color: var(--asu-navy);
+}
+
+.brand-link-button {
+  color: var(--asu-blue);
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.brand-link-button:hover {
+  color: var(--asu-navy);
+}
+
+.brand-input-focus:focus {
+  border-color: var(--asu-blue);
+  box-shadow: 0 0 0 3px rgba(0, 59, 122, 0.16);
 }

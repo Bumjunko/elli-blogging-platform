@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BrandHeader } from "@/components/layout/brand-header";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 type PublicPostSummary = {
@@ -70,45 +71,21 @@ export default async function PublicBlogPage() {
   const publicPosts = await addSignedImageUrls(supabase, posts ?? []);
 
   return (
-    <main className="min-h-screen bg-[#f5f7fa] text-slate-950">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <Link href="/" className="text-sm font-semibold text-[#174a7c]">
-              ELLI Blogging Platform
-            </Link>
-            <h1 className="mt-2 text-2xl font-semibold tracking-normal">
-              Student Blog
-            </h1>
-          </div>
-          <nav className="flex flex-wrap gap-3">
-            <Link
-              href="/"
-              className="flex h-10 items-center rounded-md border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-100"
-            >
-              Home
-            </Link>
-            <Link
-              href="/login"
-              className="flex h-10 items-center rounded-md bg-[#174a7c] px-4 text-sm font-semibold text-white transition hover:bg-[#10385f]"
-            >
-              Sign in
-            </Link>
-          </nav>
-        </div>
-      </header>
+    <main className="min-h-screen brand-page text-slate-950">
+      <BrandHeader
+        title="ELLI Student Blog"
+        eyebrow=" "
+        subtitle="English learning stories from ELLI students, visible only after ELLI instructor review and publication."
+      />
 
       <div className="mx-auto w-full max-w-6xl px-6 py-8">
         <section className="mb-6">
-          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#8a5a10]">
-            Published after CIS review
-          </p>
-          <h2 className="mt-2 max-w-3xl text-4xl font-semibold tracking-normal text-slate-950">
+          <h2 className="max-w-3xl text-4xl font-semibold text-[#002856]">
             English learning stories from ELLI students.
           </h2>
-          <p className="mt-3 max-w-2xl text-base leading-7 text-slate-600">
-            Every post on this page has been reviewed and published by CIS
-            staff before becoming publicly visible.
+          <p className="mt-3 max-w-5xl text-base leading-7 text-slate-600 md:whitespace-nowrap">
+            Every post on this page has been reviewed and published by ELLI
+            instructors before becoming publicly visible.
           </p>
         </section>
 
@@ -123,7 +100,7 @@ export default async function PublicBlogPage() {
             {publicPosts.map((post) => (
               <article
                 key={post.id}
-                className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm"
+                className="brand-surface overflow-hidden"
               >
                 {post.imageUrl ? (
                   <Link href={`/blog/${post.slug}`} className="block bg-slate-100">
@@ -145,7 +122,7 @@ export default async function PublicBlogPage() {
                   <h3 className="mt-2 text-xl font-semibold leading-7 text-slate-950">
                     <Link
                       href={`/blog/${post.slug}`}
-                      className="transition hover:text-[#174a7c]"
+                      className="transition hover:text-[#003b7a]"
                     >
                       {post.title}
                     </Link>
@@ -157,7 +134,7 @@ export default async function PublicBlogPage() {
                   ) : null}
                   <Link
                     href={`/blog/${post.slug}`}
-                    className="mt-4 inline-flex h-9 items-center rounded-md border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-100"
+                    className="brand-outline-button mt-4 h-9"
                   >
                     Read post
                   </Link>
@@ -166,8 +143,8 @@ export default async function PublicBlogPage() {
             ))}
           </section>
         ) : !error ? (
-          <section className="rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center">
-            <h2 className="text-lg font-semibold text-slate-950">
+          <section className="brand-surface border-dashed p-8 text-center">
+            <h2 className="text-lg font-semibold text-[#002856]">
               No public posts yet
             </h2>
             <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-600">
